@@ -6,7 +6,7 @@ import {
 } from 'react-router-dom'
 import { useWallet } from 'use-wallet'
 
-import StaticsCards from "../Statics/componnents/StaticsCards"
+import StaticsCards from "./componnents/StaticsCards"
 
 import farmer from '../../assets/img/farmer.png'
 

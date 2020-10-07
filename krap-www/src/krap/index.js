@@ -6,7 +6,7 @@ BigNumber.config({
   DECIMAL_PLACES: 80,
 });
 
-export { Krap } from './Krap.js';
+export { Krap } from './Krap.js.js';
 export {
   Web3,
   BigNumber,

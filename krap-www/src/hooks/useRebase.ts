@@ -4,7 +4,7 @@ import { useWallet } from 'use-wallet'
 import { Krap } from '../krap'
 import { rebase } from '../krapUtils'
 
-import usekrap from '../hooks/usekrap'
+import usekrap from './usekrap'
 
 const useRebase = () => {
   const { account } = useWallet()
