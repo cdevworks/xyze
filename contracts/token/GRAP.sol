@@ -1,9 +1,9 @@
 pragma solidity 0.5.17;
 
-/* import "./GRAPTokenInterface.sol"; */
-import "./GRAPGovernance.sol";
+/* import "./KRAPTokenInterface.sol"; */
+import "./KRAPGovernance.sol";
 
-contract GRAPToken is GRAPGovernanceToken {
+contract KRAPToken is KRAPGovernanceToken {
     // Modifiers
     modifier onlyGov() {
         require(msg.sender == gov);
@@ -33,7 +33,7 @@ contract GRAPToken is GRAPGovernanceToken {
     )
         public
     {
-        require(grapsScalingFactor == 0, "already initialized");
+        require(krapsScalingFactor == 0, "already initialized");
         name = name_;
         symbol = symbol_;
         decimals = decimals_;
@@ -66,8 +66,8 @@ contract GRAPToken is GRAPGovernanceToken {
         view
         returns (uint256)
     {
-        // scaling factor can only go up to 2**256-1 = initSupply * grapsScalingFactor
-        // this is used to check if grapsScalingFactor will be too high to compute balances when rebasing.
+        // scaling factor can only go up to 2**256-1 = initSupply * krapsScalingFactor
+        // this is used to check if krapsScalingFactor will be too high to compute balances when rebasing.
         return uint256(-1) / initSupply;
     }
 
@@ -91,20 +91,20 @@ contract GRAPToken is GRAPGovernanceToken {
       _totalSupply = _totalSupply.add(amount.mul(10**24/ (BASE)));
 
       // get underlying value
-      uint256 grapValue = amount.mul(internalDecimals).div(grapsScalingFactor);
+      uint256 krapValue = amount.mul(internalDecimals).div(krapsScalingFactor);
 
       // increase initSupply
-      initSupply = initSupply.add(grapValue);
+      initSupply = initSupply.add(krapValue);
 
       // make sure the mint didnt push maxScalingFactor too low
-      require(grapsScalingFactor <= _maxScalingFactor(), "max scaling factor too low");
+      require(krapsScalingFactor <= _maxScalingFactor(), "max scaling factor too low");
 
       // add balance
-      _grapBalances[to] = _grapBalances[to].add(grapValue);
+      _krapBalances[to] = _krapBalances[to].add(krapValue);
       emit Transfer(address(0), to, amount);
     
       // add delegates to the minter
-      _moveDelegates(address(0), _delegates[to], grapValue);
+      _moveDelegates(address(0), _delegates[to], krapValue);
       emit Mint(to, amount);
     }
 
@@ -121,22 +121,22 @@ contract GRAPToken is GRAPGovernanceToken {
         validRecipient(to)
         returns (bool)
     {
-        // underlying balance is stored in graps, so divide by current scaling factor
+        // underlying balance is stored in kraps, so divide by current scaling factor
 
         // note, this means as scaling factor grows, dust will be untransferrable.
-        // minimum transfer value == grapsScalingFactor / 1e24;
+        // minimum transfer value == krapsScalingFactor / 1e24;
 
         // get amount in underlying
-        uint256 grapValue = value.mul(internalDecimals).div(grapsScalingFactor);
+        uint256 krapValue = value.mul(internalDecimals).div(krapsScalingFactor);
 
         // sub from balance of sender
-        _grapBalances[msg.sender] = _grapBalances[msg.sender].sub(grapValue);
+        _krapBalances[msg.sender] = _krapBalances[msg.sender].sub(krapValue);
 
         // add to balance of receiver
-        _grapBalances[to] = _grapBalances[to].add(grapValue);
+        _krapBalances[to] = _krapBalances[to].add(krapValue);
         emit Transfer(msg.sender, to, value);
 
-        _moveDelegates(_delegates[msg.sender], _delegates[to], grapValue);
+        _moveDelegates(_delegates[msg.sender], _delegates[to], krapValue);
         return true;
     }
 
@@ -154,15 +154,15 @@ contract GRAPToken is GRAPGovernanceToken {
         // decrease allowance
         _allowedFragments[from][msg.sender] = _allowedFragments[from][msg.sender].sub(value);
 
-        // get value in graps
-        uint256 grapValue = value.mul(internalDecimals).div(grapsScalingFactor);
+        // get value in kraps
+        uint256 krapValue = value.mul(internalDecimals).div(krapsScalingFactor);
 
         // sub from from
-        _grapBalances[from] = _grapBalances[from].sub(grapValue);
-        _grapBalances[to] = _grapBalances[to].add(grapValue);
+        _krapBalances[from] = _krapBalances[from].sub(krapValue);
+        _krapBalances[to] = _krapBalances[to].add(krapValue);
         emit Transfer(from, to, value);
 
-        _moveDelegates(_delegates[from], _delegates[to], grapValue);
+        _moveDelegates(_delegates[from], _delegates[to], krapValue);
         return true;
     }
 
@@ -175,7 +175,7 @@ contract GRAPToken is GRAPGovernanceToken {
       view
       returns (uint256)
     {
-      return _grapBalances[who].mul(grapsScalingFactor).div(internalDecimals);
+      return _krapBalances[who].mul(krapsScalingFactor).div(internalDecimals);
     }
 
     /** @notice Currently returns the internal storage amount
@@ -187,7 +187,7 @@ contract GRAPToken is GRAPGovernanceToken {
       view
       returns (uint256)
     {
-      return _grapBalances[who];
+      return _krapBalances[who];
     }
 
     /**
@@ -331,30 +331,30 @@ contract GRAPToken is GRAPGovernanceToken {
         returns (uint256)
     {
         if (indexDelta == 0) {
-          emit Rebase(epoch, grapsScalingFactor, grapsScalingFactor);
+          emit Rebase(epoch, krapsScalingFactor, krapsScalingFactor);
           return _totalSupply;
         }
 
-        uint256 prevGrapsScalingFactor = grapsScalingFactor;
+        uint256 prevkrapsScalingFactor = krapsScalingFactor;
 
         if (!positive) {
-           grapsScalingFactor = grapsScalingFactor.mul(BASE.sub(indexDelta)).div(BASE);
+           krapsScalingFactor = krapsScalingFactor.mul(BASE.sub(indexDelta)).div(BASE);
         } else {
-            uint256 newScalingFactor = grapsScalingFactor.mul(BASE.add(indexDelta)).div(BASE);
+            uint256 newScalingFactor = krapsScalingFactor.mul(BASE.add(indexDelta)).div(BASE);
             if (newScalingFactor < _maxScalingFactor()) {
-                grapsScalingFactor = newScalingFactor;
+                krapsScalingFactor = newScalingFactor;
             } else {
-              grapsScalingFactor = _maxScalingFactor();
+              krapsScalingFactor = _maxScalingFactor();
             }
         }
 
-        _totalSupply = initSupply.mul(grapsScalingFactor).div(BASE);
-        emit Rebase(epoch, prevGrapsScalingFactor, grapsScalingFactor);
+        _totalSupply = initSupply.mul(krapsScalingFactor).div(BASE);
+        emit Rebase(epoch, prevkrapsScalingFactor, krapsScalingFactor);
         return _totalSupply;
     }
 }
 
-contract GRAP is GRAPToken {
+contract KRAP is KRAPToken {
     /**
      * @notice Initialize the new money market
      * @param name_ ERC-20 name of this token
@@ -376,8 +376,8 @@ contract GRAP is GRAPToken {
 
         initSupply = initSupply_.mul(10**24/ (BASE));
         _totalSupply = initSupply;
-        grapsScalingFactor = BASE;
-        _grapBalances[initial_owner] = initSupply_.mul(10**24 / (BASE));
+        krapsScalingFactor = BASE;
+        _krapBalances[initial_owner] = initSupply_.mul(10**24 / (BASE));
 
         // owner renounces ownership after deployment as they need to set
         // rebaser and incentivizer

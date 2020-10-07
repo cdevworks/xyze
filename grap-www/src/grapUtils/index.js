@@ -2,7 +2,7 @@ import {ethers} from 'ethers'
 
 import BigNumber from 'bignumber.js'
 
-import {PROPOSALSTATUSCODE} from '../grap/lib/constants'
+import {PROPOSALSTATUSCODE} from '../krap/lib/constants'
 
 BigNumber.config({
   EXPONENTIAL_AT: 1000,
@@ -87,78 +87,78 @@ export const approve = async (tokenContract, poolContract, account) => {
     .send({ from: account, gas: 80000 })
 }
 
-export const rebase = async (grap, account) => {
-  return grap.contracts.rebaser.methods.rebase().send({ from: account })
+export const rebase = async (krap, account) => {
+  return krap.contracts.rebaser.methods.rebase().send({ from: account })
 }
 
-export const getPoolContracts = async (grap) => {
-  const pools = Object.keys(grap.contracts)
+export const getPoolContracts = async (krap) => {
+  const pools = Object.keys(krap.contracts)
     .filter(c => c.indexOf('_pool') !== -1)
     .reduce((acc, cur) => {
       const newAcc = { ...acc }
-      newAcc[cur] = grap.contracts[cur]
+      newAcc[cur] = krap.contracts[cur]
       return newAcc
     }, {})
   return pools
 }
 
-export const getEarned = async (grap, pool, account) => {
-  const scalingFactor = new BigNumber(await grap.contracts.grap.methods.grapsScalingFactor().call())
+export const getEarned = async (krap, pool, account) => {
+  const scalingFactor = new BigNumber(await krap.contracts.krap.methods.krapsScalingFactor().call())
   const earned = new BigNumber(await pool.methods.earned(account).call())
   return earned.multipliedBy(scalingFactor.dividedBy(new BigNumber(10).pow(18)))
 }
 
-export const getStaked = async (grap, pool, account) => {
-  return grap.toBigN(await pool.methods.balanceOf(account).call())
+export const getStaked = async (krap, pool, account) => {
+  return krap.toBigN(await pool.methods.balanceOf(account).call())
 }
 
-export const getCurrentPrice = async (grap) => {
-  // FORBROCK: get current GRAP price
-  return grap.toBigN(await grap.contracts.rebaser.methods.getCurrentTWAP().call())
+export const getCurrentPrice = async (krap) => {
+  // FORBROCK: get current KRAP price
+  return krap.toBigN(await krap.contracts.rebaser.methods.getCurrentTWAP().call())
 }
 
-export const getTargetPrice = async (grap) => {
-  return grap.toBigN(1).toFixed(2);
+export const getTargetPrice = async (krap) => {
+  return krap.toBigN(1).toFixed(2);
 }
 
-export const getCirculatingSupply = async (grap) => {
-  let now = await grap.web3.eth.getBlock('latest');
-  let scalingFactor = grap.toBigN(await grap.contracts.grap.methods.grapsScalingFactor().call());
-  let starttime = grap.toBigN(await grap.contracts.eth_pool.methods.starttime().call()).toNumber();
+export const getCirculatingSupply = async (krap) => {
+  let now = await krap.web3.eth.getBlock('latest');
+  let scalingFactor = krap.toBigN(await krap.contracts.krap.methods.krapsScalingFactor().call());
+  let starttime = krap.toBigN(await krap.contracts.eth_pool.methods.starttime().call()).toNumber();
   let timePassed = now["timestamp"] - starttime;
   if (timePassed < 0) {
     return 0;
   }
-  let grapsDistributed = grap.toBigN(8 * timePassed * 250000 / 625000); //graps from first 8 pools
-  let starttimePool2 = grap.toBigN(await grap.contracts.ycrvUNIV_pool.methods.starttime().call()).toNumber();
+  let krapsDistributed = krap.toBigN(8 * timePassed * 250000 / 625000); //kraps from first 8 pools
+  let starttimePool2 = krap.toBigN(await krap.contracts.ycrvUNIV_pool.methods.starttime().call()).toNumber();
   timePassed = now["timestamp"] - starttime;
-  let pool2Yams = grap.toBigN(timePassed * 1500000 / 625000); // graps from second pool. note: just accounts for first week
-  let circulating = pool2Yams.plus(grapsDistributed).times(scalingFactor).div(10**36).toFixed(2)
+  let pool2Yams = krap.toBigN(timePassed * 1500000 / 625000); // kraps from second pool. note: just accounts for first week
+  let circulating = pool2Yams.plus(krapsDistributed).times(scalingFactor).div(10**36).toFixed(2)
   return circulating
 }
 
-export const getRebaseStatus = async (grap) => {
-  let now = await grap.web3.eth.getBlock('latest').then(res => res.timestamp);
-  let lastRebaseTimestampSec = await grap.contracts.rebaser.methods.lastRebaseTimestampSec().call();
+export const getRebaseStatus = async (krap) => {
+  let now = await krap.web3.eth.getBlock('latest').then(res => res.timestamp);
+  let lastRebaseTimestampSec = await krap.contracts.rebaser.methods.lastRebaseTimestampSec().call();
   return now >= lastRebaseTimestampSec + 60 * 60 * 24 * 1000;
 }
 
-export const getNextRebaseTimestamp = async (grap) => {
+export const getNextRebaseTimestamp = async (krap) => {
   try {
-    let now = await grap.web3.eth.getBlock('latest').then(res => res.timestamp);
+    let now = await krap.web3.eth.getBlock('latest').then(res => res.timestamp);
     let interval = 86400; // 24 hours
     let offset = 0; // 0AM utc
     let secondsToRebase = 0;
-    if (await grap.contracts.rebaser.methods.rebasingActive().call()) {
+    if (await krap.contracts.rebaser.methods.rebasingActive().call()) {
       if (now % interval > offset) {
           secondsToRebase = (interval - (now % interval)) + offset;
        } else {
           secondsToRebase = offset - (now % interval);
       }
     } else {
-      let twap_init = grap.toBigN(await grap.contracts.rebaser.methods.timeOfTWAPInit().call()).toNumber();
+      let twap_init = krap.toBigN(await krap.contracts.rebaser.methods.timeOfTWAPInit().call()).toNumber();
       if (twap_init > 0) {
-        let delay = grap.toBigN(await grap.contracts.rebaser.methods.rebaseDelay().call()).toNumber();
+        let delay = krap.toBigN(await krap.contracts.rebaser.methods.rebaseDelay().call()).toNumber();
         let endTime = twap_init + delay;
         if (endTime % interval > offset) {
             secondsToRebase = (interval - (endTime % interval)) + offset;
@@ -176,16 +176,16 @@ export const getNextRebaseTimestamp = async (grap) => {
   }
 }
 
-export const getTotalSupply = async (grap) => {
-  return await grap.contracts.grap.methods.totalSupply().call();
+export const getTotalSupply = async (krap) => {
+  return await krap.contracts.krap.methods.totalSupply().call();
 }
 
-export const getStats = async (grap) => {
-  const curPrice = await getCurrentPrice(grap)
-  const circSupply = await getCirculatingSupply(grap)
-  const nextRebase = await getNextRebaseTimestamp(grap)
-  const targetPrice = await getTargetPrice(grap)
-  const totalSupply = await getTotalSupply(grap)
+export const getStats = async (krap) => {
+  const curPrice = await getCurrentPrice(krap)
+  const circSupply = await getCirculatingSupply(krap)
+  const nextRebase = await getNextRebaseTimestamp(krap)
+  const targetPrice = await getTargetPrice(krap)
+  const totalSupply = await getTotalSupply(krap)
   return {
     circSupply,
     curPrice,
@@ -197,13 +197,13 @@ export const getStats = async (grap) => {
 
 
 // gov
-export const getProposals = async (grap) => {
+export const getProposals = async (krap) => {
   let proposals = []
   const filter = {
     fromBlock: 0,
     toBlock: 'latest',
   }
-  const events = await grap.contracts.gov.getPastEvents("allEvents", filter)
+  const events = await krap.contracts.gov.getPastEvents("allEvents", filter)
   for (let i = 0; i < events.length; i++) {
     const event = events[i]
     let index = 0;
@@ -247,33 +247,33 @@ export const getProposals = async (grap) => {
   return proposals
 }
 
-export const getProposal = async (grap, id) => {
-  const proposals = await getProposals(grap)
+export const getProposal = async (krap, id) => {
+  const proposals = await getProposals(krap)
   const proposal = proposals.find(p => p.id === id )
   return proposal
 }
 
-export const getProposalStatus = async (grap, id) => {
-  const proposalStatus = (await grap.contracts.gov.methods.proposals(id).call())
+export const getProposalStatus = async (krap, id) => {
+  const proposalStatus = (await krap.contracts.gov.methods.proposals(id).call())
   return proposalStatus
 }
 
-export const getQuorumVotes = async (grap) => {
-  return new BigNumber(await grap.contracts.gov.methods.quorumVotes().call()).div(10**6)
+export const getQuorumVotes = async (krap) => {
+  return new BigNumber(await krap.contracts.gov.methods.quorumVotes().call()).div(10**6)
 }
 
-export const getProposalThreshold = async (grap) => {
-  return new BigNumber(await grap.contracts.gov.methods.proposalThreshold().call()).div(10**6)
+export const getProposalThreshold = async (krap) => {
+  return new BigNumber(await krap.contracts.gov.methods.proposalThreshold().call()).div(10**6)
 }
 
-export const getCurrentVotes = async (grap, account) => {
-  return grap.toBigN(await grap.contracts.grap.methods.getCurrentVotes(account).call()).div(10**6)
+export const getCurrentVotes = async (krap, account) => {
+  return krap.toBigN(await krap.contracts.krap.methods.getCurrentVotes(account).call()).div(10**6)
 }
 
-export const delegate = async (grap, account, from) => {
-  return grap.contracts.grap.methods.delegate(account).send({from: from, gas: 320000 })
+export const delegate = async (krap, account, from) => {
+  return krap.contracts.krap.methods.delegate(account).send({from: from, gas: 320000 })
 }
 
-export const castVote = async (grap, id, support, from) => {
-  return grap.contracts.gov.methods.castVote(id, support).send({from: from, gas: 320000 })
+export const castVote = async (krap, id, support, from) => {
+  return krap.contracts.gov.methods.castVote(id, support).send({from: from, gas: 320000 })
 }

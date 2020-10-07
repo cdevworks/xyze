@@ -1,19 +1,19 @@
 import { useCallback } from 'react'
 
 import { useWallet } from 'use-wallet'
-import { Grap } from '../grap'
-import { rebase } from '../grapUtils'
+import { Krap } from '../krap'
+import { rebase } from '../krapUtils'
 
-import useGrap from '../hooks/useGrap'
+import usekrap from '../hooks/usekrap'
 
 const useRebase = () => {
   const { account } = useWallet()
-  const grap = useGrap()
+  const krap = usekrap()
 
   const handleRebase = useCallback(async () => {
-    const txHash = await rebase(grap, account)
+    const txHash = await rebase(krap, account)
     console.log(txHash)
-  }, [account, grap])
+  }, [account, krap])
 
   return { onRebase: handleRebase }
 }

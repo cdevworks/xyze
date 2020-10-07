@@ -13,7 +13,7 @@ import TopBar from './components/TopBar'
 import ProposalsProvider from './contexts/Proposals'
 import FarmsProvider from './contexts/Farms'
 import ModalsProvider from './contexts/Modals'
-import GrapProvider from './contexts/GrapProvider'
+import krapProvider from './contexts/krapProvider'
 import TransactionProvider from './contexts/Transactions'
 
 import Farms from './views/Farms'
@@ -60,7 +60,7 @@ const Providers: React.FC = ({ children }) => {
   return (
     <ThemeProvider theme={theme}>
       <UseWalletProvider chainId={1}>
-        <GrapProvider>
+        <krapProvider>
           <TransactionProvider>
             <ModalsProvider>
               <FarmsProvider>
@@ -70,7 +70,7 @@ const Providers: React.FC = ({ children }) => {
               </FarmsProvider>
             </ModalsProvider>
           </TransactionProvider>
-        </GrapProvider>
+        </krapProvider>
       </UseWalletProvider>
     </ThemeProvider>
   )

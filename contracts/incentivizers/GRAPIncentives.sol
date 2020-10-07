@@ -5,7 +5,7 @@
 /___/ \_, //_//_/\__//_//_/\__/ \__//_/ /_\_\
      /___/
 
-* Synthetix: GRAPIncentives.sol
+* Synthetix: KRAPIncentives.sol
 *
 * Docs: https://docs.synthetix.io/
 *
@@ -624,13 +624,13 @@ contract LPTokenWrapper {
     }
 }
 
-interface GRAP {
-    function grapsScalingFactor() external returns (uint256);
+interface KRAP {
+    function krapsScalingFactor() external returns (uint256);
     function mint(address to, uint256 amount) external;
 }
 
-contract GRAPIncentivizer is LPTokenWrapper, IRewardDistributionRecipient {
-    IERC20 public grap = IERC20(0xC8D2AB2a6FdEbC25432E54941cb85b55b9f152dB);
+contract KRAPIncentivizer is LPTokenWrapper, IRewardDistributionRecipient {
+    IERC20 public krap = IERC20(0xC8D2AB2a6FdEbC25432E54941cb85b55b9f152dB);
     uint256 public constant DURATION = 625000;
 
     uint256 public initreward = 15 * 10**5 * 10**18; // 1.5m
@@ -706,9 +706,9 @@ contract GRAPIncentivizer is LPTokenWrapper, IRewardDistributionRecipient {
         uint256 reward = earned(msg.sender);
         if (reward > 0) {
             rewards[msg.sender] = 0;
-            uint256 scalingFactor = GRAP(address(grap)).grapsScalingFactor();
+            uint256 scalingFactor = KRAP(address(krap)).krapsScalingFactor();
             uint256 trueReward = reward.mul(scalingFactor).div(10**18);
-            grap.safeTransfer(msg.sender, trueReward);
+            krap.safeTransfer(msg.sender, trueReward);
             emit RewardPaid(msg.sender, trueReward);
         }
     }
@@ -716,9 +716,9 @@ contract GRAPIncentivizer is LPTokenWrapper, IRewardDistributionRecipient {
     modifier checkhalve() {
         if (block.timestamp >= periodFinish) {
             initreward = initreward.mul(50).div(100);
-            uint256 scalingFactor = GRAP(address(grap)).grapsScalingFactor();
+            uint256 scalingFactor = KRAP(address(krap)).krapsScalingFactor();
             uint256 newRewards = initreward.mul(scalingFactor).div(10**18);
-            grap.mint(address(this), newRewards);
+            krap.mint(address(this), newRewards);
 
             rewardRate = initreward.div(DURATION);
             periodFinish = block.timestamp.add(DURATION);
@@ -753,8 +753,8 @@ contract GRAPIncentivizer is LPTokenWrapper, IRewardDistributionRecipient {
           periodFinish = block.timestamp.add(DURATION);
           emit RewardAdded(reward);
         } else {
-          require(grap.balanceOf(address(this)) == 0, "already initialized");
-          grap.mint(address(this), initreward);
+          require(krap.balanceOf(address(this)) == 0, "already initialized");
+          krap.mint(address(this), initreward);
           rewardRate = initreward.div(DURATION);
           lastUpdateTime = starttime;
           periodFinish = starttime.add(DURATION);
@@ -778,7 +778,7 @@ contract GRAPIncentivizer is LPTokenWrapper, IRewardDistributionRecipient {
         // cant take staked asset
         require(_token != uni_lp, "uni_lp");
         // cant take reward asset
-        require(_token != grap, "grap");
+        require(_token != krap, "krap");
 
         // transfer to
         _token.safeTransfer(to, amount);

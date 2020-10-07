@@ -1,9 +1,9 @@
 import { useContext } from 'react'
-import { Context } from '../contexts/GrapProvider'
+import { Context } from '../contexts/krapProvider'
 
-const useGrap = () => {
-  const { grap } = useContext(Context)
-  return grap
+const usekrap = () => {
+  const { krap } = useContext(Context)
+  return krap
 }
 
-export default useGrap
+export default usekrap

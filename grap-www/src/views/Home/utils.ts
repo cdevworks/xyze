@@ -1,4 +1,4 @@
-import { Grap } from '../../grap'
+import { Krap } from '../../krap'
 
 import {
   getCurrentPrice as gCP,
@@ -6,40 +6,40 @@ import {
   getCirculatingSupply as gCS,
   getNextRebaseTimestamp as gNRT,
   getTotalSupply as gTS,
-} from '../../grapUtils'
+} from '../../krapUtils'
 
-const getCurrentPrice = async (grap: typeof Grap): Promise<number> => {
-  // FORBROCK: get current GRAP price
-  return gCP(grap)
+const getCurrentPrice = async (krap: typeof Krap): Promise<number> => {
+  // FORBROCK: get current KRAP price
+  return gCP(krap)
 }
 
-const getTargetPrice = async (grap: typeof Grap): Promise<number> => {
-  // FORBROCK: get target GRAP price
-  return gTP(grap)
+const getTargetPrice = async (krap: typeof Krap): Promise<number> => {
+  // FORBROCK: get target KRAP price
+  return gTP(krap)
 }
 
-const getCirculatingSupply = async (grap: typeof Grap): Promise<string> => {
+const getCirculatingSupply = async (krap: typeof Krap): Promise<string> => {
   // FORBROCK: get circulating supply
-  return gCS(grap)
+  return gCS(krap)
 }
 
-const getNextRebaseTimestamp = async (grap: typeof Grap): Promise<number> => {
+const getNextRebaseTimestamp = async (krap: typeof Krap): Promise<number> => {
   // FORBROCK: get next rebase timestamp
-  const nextRebase = await gNRT(grap) as number
+  const nextRebase = await gNRT(krap) as number
   return nextRebase * 1000
 }
 
-const getTotalSupply = async (grap: typeof Grap): Promise<string> => {
+const getTotalSupply = async (krap: typeof Krap): Promise<string> => {
   // FORBROCK: get total supply
-  return gTS(grap)
+  return gTS(krap)
 }
 
-export const getStats = async (grap: typeof Grap) => {
-  const curPrice = await getCurrentPrice(grap)
-  const circSupply = await getCirculatingSupply(grap)
-  const nextRebase = await getNextRebaseTimestamp(grap)
-  const targetPrice = await getTargetPrice(grap)
-  const totalSupply = await getTotalSupply(grap)
+export const getStats = async (krap: typeof Krap) => {
+  const curPrice = await getCurrentPrice(krap)
+  const circSupply = await getCirculatingSupply(krap)
+  const nextRebase = await getNextRebaseTimestamp(krap)
+  const targetPrice = await getTargetPrice(krap)
+  const totalSupply = await getTotalSupply(krap)
   return {
     circSupply,
     curPrice,

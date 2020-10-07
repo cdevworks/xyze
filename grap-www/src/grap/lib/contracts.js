@@ -4,11 +4,11 @@ import * as Types from "./types.js";
 import { SUBTRACT_GAS_LIMIT, addressMap } from './constants.js';
 
 import ERC20Json from '../clean_build/contracts/IERC20.json';
-import GRAPJson from '../clean_build/contracts/GRAPDelegator.json';
-import GRAPRebaserJson from '../clean_build/contracts/GRAPRebaser.json';
-import GRAPReservesJson from '../clean_build/contracts/GRAPReserves.json';
-import GRAPGovJson from '../clean_build/contracts/GovernorAlpha.json';
-import GRAPTimelockJson from '../clean_build/contracts/Timelock.json';
+import KRAPJson from '../clean_build/contracts/KRAPDelegator.json';
+import KRAPRebaserJson from '../clean_build/contracts/KRAPRebaser.json';
+import KRAPReservesJson from '../clean_build/contracts/KRAPReserves.json';
+import KRAPGovJson from '../clean_build/contracts/GovernorAlpha.json';
+import KRAPTimelockJson from '../clean_build/contracts/Timelock.json';
 import WETHJson from './weth.json';
 import CRVJson from './crv.json';
 import UNIFactJson from './unifact2.json';
@@ -16,19 +16,19 @@ import UNIPairJson from './uni2.json';
 import UNIRouterJson from './uniR.json';
 
 // basic pool
-import WETHPoolJson from '../clean_build/contracts/GRAPETHPool.json';
-import YAMPoolJson from '../clean_build/contracts/GRAPYAMPool.json';
-import YFIPoolJson from '../clean_build/contracts/GRAPYFIPool.json';
-import YFIIPoolJson from '../clean_build/contracts/GRAPYFIIPool.json';
-import MKRPoolJson from '../clean_build/contracts/GRAPMKRPool.json';
-import LENDPoolJson from '../clean_build/contracts/GRAPLENDPool.json';
-import COMPPoolJson from '../clean_build/contracts/GRAPCOMPPool.json';
-import CRVPoolJson from '../clean_build/contracts/GRAPCRVPool.json';
-import LINKPoolJson from '../clean_build/contracts/GRAPLINKPool.json';
-import SNXPoolJson from '../clean_build/contracts/GRAPSNXPool.json';
+import WETHPoolJson from '../clean_build/contracts/KRAPETHPool.json';
+import YAMPoolJson from '../clean_build/contracts/KRAPYAMPool.json';
+import YFIPoolJson from '../clean_build/contracts/KRAPYFIPool.json';
+import YFIIPoolJson from '../clean_build/contracts/KRAPYFIIPool.json';
+import MKRPoolJson from '../clean_build/contracts/KRAPMKRPool.json';
+import LENDPoolJson from '../clean_build/contracts/KRAPLENDPool.json';
+import COMPPoolJson from '../clean_build/contracts/KRAPCOMPPool.json';
+import CRVPoolJson from '../clean_build/contracts/KRAPCRVPool.json';
+import LINKPoolJson from '../clean_build/contracts/KRAPLINKPool.json';
+import SNXPoolJson from '../clean_build/contracts/KRAPSNXPool.json';
 
 // uniswap pool
-import IncJson from '../clean_build/contracts/GRAPIncentivizer.json';
+import IncJson from '../clean_build/contracts/KRAPIncentivizer.json';
 
 export class Contracts {
   constructor(
@@ -66,7 +66,7 @@ export class Contracts {
     this.yfi = new this.web3.eth.Contract(ERC20Json.abi);
     this.yam = new this.web3.eth.Contract(ERC20Json.abi);
     this.crv = new this.web3.eth.Contract(ERC20Json.abi);
-    this.grap = new this.web3.eth.Contract(GRAPJson.abi);
+    this.krap = new this.web3.eth.Contract(KRAPJson.abi);
     this.comp = new this.web3.eth.Contract(ERC20Json.abi);
     this.yam = new this.web3.eth.Contract(ERC20Json.abi);
     this.link = new this.web3.eth.Contract(ERC20Json.abi);
@@ -80,10 +80,10 @@ export class Contracts {
     this.ycrvUNIV = new this.web3.eth.Contract(ERC20Json.abi);
     this.uni_lp = this.ycrvUNIV;
 
-    this.rebaser = new this.web3.eth.Contract(GRAPRebaserJson.abi);
-    this.reserves = new this.web3.eth.Contract(GRAPReservesJson.abi);
-    this.gov = new this.web3.eth.Contract(GRAPGovJson.abi);
-    this.timelock = new this.web3.eth.Contract(GRAPTimelockJson.abi);
+    this.rebaser = new this.web3.eth.Contract(KRAPRebaserJson.abi);
+    this.reserves = new this.web3.eth.Contract(KRAPReservesJson.abi);
+    this.gov = new this.web3.eth.Contract(KRAPGovJson.abi);
+    this.timelock = new this.web3.eth.Contract(KRAPTimelockJson.abi);
     this.weth = new this.web3.eth.Contract(WETHJson);
     this.setProvider(provider, networkId);
     this.setDefaultAccount(this.web3.eth.defaultAccount);
@@ -94,17 +94,17 @@ export class Contracts {
     provider,
     networkId
   ) {
-    this.grap.setProvider(provider);
+    this.krap.setProvider(provider);
     this.rebaser.setProvider(provider);
     this.reserves.setProvider(provider);
     this.gov.setProvider(provider);
     this.timelock.setProvider(provider);
     const contracts = [
-      { contract: this.grap, json: GRAPJson },
-      { contract: this.rebaser, json: GRAPRebaserJson },
-      { contract: this.reserves, json: GRAPReservesJson },
-      { contract: this.gov, json: GRAPGovJson },
-      { contract: this.timelock, json: GRAPTimelockJson },
+      { contract: this.krap, json: KRAPJson },
+      { contract: this.rebaser, json: KRAPRebaserJson },
+      { contract: this.reserves, json: KRAPReservesJson },
+      { contract: this.gov, json: KRAPGovJson },
+      { contract: this.timelock, json: KRAPTimelockJson },
       { contract: this.eth_pool, json: WETHPoolJson },
       { contract: this.yfi_pool, json: YFIPoolJson },
       { contract: this.yfii_pool, json: YFIIPoolJson },
@@ -160,7 +160,7 @@ export class Contracts {
   ) {
     this.yfi.options.from = account;
     this.crv.options.from = account;
-    this.grap.options.from = account;
+    this.krap.options.from = account;
     this.weth.options.from = account;
   }
 

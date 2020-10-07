@@ -2,29 +2,29 @@ import React, { createContext, useEffect, useState } from 'react'
 
 import { useWallet } from 'use-wallet'
 
-import { Grap } from '../../grap'
+import { Krap } from '../../krap'
 
-export interface GrapContext {
-  grap?: typeof Grap
+export interface krapContext {
+  krap?: typeof Krap
 }
 
-export const Context = createContext<GrapContext>({
-  grap: undefined,
+export const Context = createContext<krapContext>({
+  krap: undefined,
 })
 
 declare global {
   interface Window {
-    grapsauce: any
+    krapsauce: any
   }
 }
 
-const GrapProvider: React.FC = ({ children }) => {
+const krapProvider: React.FC = ({ children }) => {
   const { ethereum } = useWallet()
-  const [grap, setGrap] = useState<any>()
+  const [krap, setkrap] = useState<any>()
 
   useEffect(() => {
     if (ethereum) {
-      const grapLib = new Grap(
+      const krapLib = new Krap(
         ethereum,
         "1",
         false, {
@@ -38,16 +38,16 @@ const GrapProvider: React.FC = ({ children }) => {
           ethereumNodeTimeout: 10000
         }
       )
-      setGrap(grapLib)
-      window.grapsauce = grapLib
+      setkrap(krapLib)
+      window.krapsauce = krapLib
     }
   }, [ethereum])
 
   return (
-    <Context.Provider value={{ grap }}>
+    <Context.Provider value={{ krap }}>
       {children}
     </Context.Provider>
   )
 }
 
-export default GrapProvider
+export default krapProvider

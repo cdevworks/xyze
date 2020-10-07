@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react'
 
-import useGrap from '../../hooks/useGrap'
-import { getProposals } from '../../grapUtils'
+import usekrap from '../../hooks/usekrap'
+import { getProposals } from '../../krapUtils'
 
 import Context from './context'
 import { Proposal } from './types'
@@ -10,19 +10,19 @@ import { Proposal } from './types'
 const Proposals: React.FC = ({ children }) => {
 
   const [proposals, setProposals] = useState<Proposal[]>([])
-  const grap = useGrap()
+  const krap = usekrap()
   
   const fetchProposals = useCallback(async () => {
-    const propsArr: Proposal[] = await getProposals(grap)
+    const propsArr: Proposal[] = await getProposals(krap)
 
     setProposals(propsArr)
-  }, [grap, setProposals])
+  }, [krap, setProposals])
 
   useEffect(() => {
-    if (grap) {
+    if (krap) {
       fetchProposals()
     }
-  }, [grap, fetchProposals])
+  }, [krap, fetchProposals])
 
   return (
     <Context.Provider value={{ proposals }}>

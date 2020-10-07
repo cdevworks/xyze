@@ -11,7 +11,7 @@ import {
 } from "../lib/Helpers.js"
 
 
-export const grap = new Yam(
+export const krap = new Yam(
   "http://localhost:8545/",
   // "http://127.0.0.1:9545/",
   "1001",
@@ -36,53 +36,53 @@ describe("rebase_tests", () => {
   let unlocked_account = "0x681148725731f213b0187a3cbef215c291d85a3e";
 
   beforeAll(async () => {
-    const accounts = await grap.web3.eth.getAccounts();
-    grap.addAccount(accounts[0]);
+    const accounts = await krap.web3.eth.getAccounts();
+    krap.addAccount(accounts[0]);
     user = accounts[0];
     new_user = accounts[1];
-    snapshotId = await grap.testing.snapshot();
+    snapshotId = await krap.testing.snapshot();
   });
 
   beforeEach(async () => {
-    await grap.testing.resetEVM("0x2");
-    let a = await grap.contracts.ycrv.methods.transfer(user, "2000000000000000000000000").send({
+    await krap.testing.resetEVM("0x2");
+    let a = await krap.contracts.ycrv.methods.transfer(user, "2000000000000000000000000").send({
       from: unlocked_account
     });
   });
 
   describe("rebase", () => {
     test("user has ycrv", async () => {
-      let bal0 = await grap.contracts.ycrv.methods.balanceOf(user).call();
+      let bal0 = await krap.contracts.ycrv.methods.balanceOf(user).call();
       expect(bal0).toBe("2000000000000000000000000");
     });
     test("create pair", async () => {
-      await grap.contracts.uni_fact.methods.createPair(
-        grap.contracts.ycrv.options.address,
-        grap.contracts.grap.options.address
+      await krap.contracts.uni_fact.methods.createPair(
+        krap.contracts.ycrv.options.address,
+        krap.contracts.krap.options.address
       ).send({
         from: user,
         gas: 8000000
       })
     });
     test("mint pair", async () => {
-      await grap.contracts.grap.methods.approve(
-        grap.contracts.uni_router.options.address,
+      await krap.contracts.krap.methods.approve(
+        krap.contracts.uni_router.options.address,
         -1
       ).send({
         from: user,
         gas: 80000
       });
-      await grap.contracts.ycrv.methods.approve(
-        grap.contracts.uni_router.options.address,
+      await krap.contracts.ycrv.methods.approve(
+        krap.contracts.uni_router.options.address,
         -1
       ).send({
         from: user,
         gas: 80000
       });
 
-      await grap.contracts.uni_router.methods.addLiquidity(
-        grap.contracts.grap.options.address,
-        grap.contracts.ycrv.options.address,
+      await krap.contracts.uni_router.methods.addLiquidity(
+        krap.contracts.krap.options.address,
+        krap.contracts.ycrv.options.address,
         10000000,
         10000000,
         10000000,
@@ -93,33 +93,33 @@ describe("rebase_tests", () => {
         from: user,
         gas: 8000000
       });
-      let pair = await grap.contracts.uni_fact.methods.getPair(
-        grap.contracts.grap.options.address,
-        grap.contracts.ycrv.options.address
+      let pair = await krap.contracts.uni_fact.methods.getPair(
+        krap.contracts.krap.options.address,
+        krap.contracts.ycrv.options.address
       ).call();
-      grap.contracts.uni_pair.options.address = pair;
-      let bal = await grap.contracts.uni_pair.methods.balanceOf(user).call();
-      expect(grap.toBigN(bal).toNumber()).toBeGreaterThan(100)
+      krap.contracts.uni_pair.options.address = pair;
+      let bal = await krap.contracts.uni_pair.methods.balanceOf(user).call();
+      expect(krap.toBigN(bal).toNumber()).toBeGreaterThan(100)
     });
     test("init_twap", async () => {
-      await grap.contracts.grap.methods.approve(
-        grap.contracts.uni_router.options.address,
+      await krap.contracts.krap.methods.approve(
+        krap.contracts.uni_router.options.address,
         -1
       ).send({
         from: user,
         gas: 80000
       });
-      await grap.contracts.ycrv.methods.approve(
-        grap.contracts.uni_router.options.address,
+      await krap.contracts.ycrv.methods.approve(
+        krap.contracts.uni_router.options.address,
         -1
       ).send({
         from: user,
         gas: 80000
       });
 
-      await grap.contracts.uni_router.methods.addLiquidity(
-        grap.contracts.grap.options.address,
-        grap.contracts.ycrv.options.address,
+      await krap.contracts.uni_router.methods.addLiquidity(
+        krap.contracts.krap.options.address,
+        krap.contracts.ycrv.options.address,
         100000,
         100000,
         100000,
@@ -130,20 +130,20 @@ describe("rebase_tests", () => {
         from: user,
         gas: 8000000
       });
-      let pair = await grap.contracts.uni_fact.methods.getPair(
-        grap.contracts.grap.options.address,
-        grap.contracts.ycrv.options.address
+      let pair = await krap.contracts.uni_fact.methods.getPair(
+        krap.contracts.krap.options.address,
+        krap.contracts.ycrv.options.address
       ).call();
-      grap.contracts.uni_pair.options.address = pair;
-      let bal = await grap.contracts.uni_pair.methods.balanceOf(user).call();
+      krap.contracts.uni_pair.options.address = pair;
+      let bal = await krap.contracts.uni_pair.methods.balanceOf(user).call();
 
       // make a trade to get init values in uniswap
-      await grap.contracts.uni_router.methods.swapExactTokensForTokens(
+      await krap.contracts.uni_router.methods.swapExactTokensForTokens(
         1000,
         100,
         [
-          grap.contracts.grap.options.address,
-          grap.contracts.ycrv.options.address
+          krap.contracts.krap.options.address,
+          krap.contracts.ycrv.options.address
         ],
         user,
         1596740361 + 10000000
@@ -152,39 +152,39 @@ describe("rebase_tests", () => {
         gas: 1000000
       });
 
-      await grap.testing.increaseTime(1000);
+      await krap.testing.increaseTime(1000);
 
-      await grap.contracts.rebaser.methods.init_twap().send({
+      await krap.contracts.rebaser.methods.init_twap().send({
         from: user,
         gas: 500000
       });
 
 
 
-      let init_twap = await grap.contracts.rebaser.methods.timeOfTWAPInit().call();
-      let priceCumulativeLast = await grap.contracts.rebaser.methods.priceCumulativeLast().call();
-      expect(grap.toBigN(init_twap).toNumber()).toBeGreaterThan(0);
-      expect(grap.toBigN(priceCumulativeLast).toNumber()).toBeGreaterThan(0);
+      let init_twap = await krap.contracts.rebaser.methods.timeOfTWAPInit().call();
+      let priceCumulativeLast = await krap.contracts.rebaser.methods.priceCumulativeLast().call();
+      expect(krap.toBigN(init_twap).toNumber()).toBeGreaterThan(0);
+      expect(krap.toBigN(priceCumulativeLast).toNumber()).toBeGreaterThan(0);
     });
     test("activate rebasing", async () => {
-      await grap.contracts.grap.methods.approve(
-        grap.contracts.uni_router.options.address,
+      await krap.contracts.krap.methods.approve(
+        krap.contracts.uni_router.options.address,
         -1
       ).send({
         from: user,
         gas: 80000
       });
-      await grap.contracts.ycrv.methods.approve(
-        grap.contracts.uni_router.options.address,
+      await krap.contracts.ycrv.methods.approve(
+        krap.contracts.uni_router.options.address,
         -1
       ).send({
         from: user,
         gas: 80000
       });
 
-      await grap.contracts.uni_router.methods.addLiquidity(
-        grap.contracts.grap.options.address,
-        grap.contracts.ycrv.options.address,
+      await krap.contracts.uni_router.methods.addLiquidity(
+        krap.contracts.krap.options.address,
+        krap.contracts.ycrv.options.address,
         100000,
         100000,
         100000,
@@ -195,20 +195,20 @@ describe("rebase_tests", () => {
         from: user,
         gas: 8000000
       });
-      let pair = await grap.contracts.uni_fact.methods.getPair(
-        grap.contracts.grap.options.address,
-        grap.contracts.ycrv.options.address
+      let pair = await krap.contracts.uni_fact.methods.getPair(
+        krap.contracts.krap.options.address,
+        krap.contracts.ycrv.options.address
       ).call();
-      grap.contracts.uni_pair.options.address = pair;
-      let bal = await grap.contracts.uni_pair.methods.balanceOf(user).call();
+      krap.contracts.uni_pair.options.address = pair;
+      let bal = await krap.contracts.uni_pair.methods.balanceOf(user).call();
 
       // make a trade to get init values in uniswap
-      await grap.contracts.uni_router.methods.swapExactTokensForTokens(
+      await krap.contracts.uni_router.methods.swapExactTokensForTokens(
         1000,
         100,
         [
-          grap.contracts.grap.options.address,
-          grap.contracts.ycrv.options.address
+          krap.contracts.krap.options.address,
+          krap.contracts.ycrv.options.address
         ],
         user,
         1596740361 + 10000000
@@ -217,46 +217,46 @@ describe("rebase_tests", () => {
         gas: 1000000
       });
 
-      await grap.testing.increaseTime(1000);
+      await krap.testing.increaseTime(1000);
 
-      await grap.contracts.rebaser.methods.init_twap().send({
+      await krap.contracts.rebaser.methods.init_twap().send({
         from: user,
         gas: 500000
       });
 
 
 
-      let init_twap = await grap.contracts.rebaser.methods.timeOfTWAPInit().call();
-      let priceCumulativeLast = await grap.contracts.rebaser.methods.priceCumulativeLast().call();
-      expect(grap.toBigN(init_twap).toNumber()).toBeGreaterThan(0);
-      expect(grap.toBigN(priceCumulativeLast).toNumber()).toBeGreaterThan(0);
+      let init_twap = await krap.contracts.rebaser.methods.timeOfTWAPInit().call();
+      let priceCumulativeLast = await krap.contracts.rebaser.methods.priceCumulativeLast().call();
+      expect(krap.toBigN(init_twap).toNumber()).toBeGreaterThan(0);
+      expect(krap.toBigN(priceCumulativeLast).toNumber()).toBeGreaterThan(0);
 
-      await grap.testing.increaseTime(12 * 60 * 60);
+      await krap.testing.increaseTime(12 * 60 * 60);
 
-      await grap.contracts.rebaser.methods.activate_rebasing().send({
+      await krap.contracts.rebaser.methods.activate_rebasing().send({
         from: user,
         gas: 500000
       });
     });
     test("positive rebasing", async () => {
-      await grap.contracts.grap.methods.approve(
-        grap.contracts.uni_router.options.address,
+      await krap.contracts.krap.methods.approve(
+        krap.contracts.uni_router.options.address,
         -1
       ).send({
         from: user,
         gas: 80000
       });
-      await grap.contracts.ycrv.methods.approve(
-        grap.contracts.uni_router.options.address,
+      await krap.contracts.ycrv.methods.approve(
+        krap.contracts.uni_router.options.address,
         -1
       ).send({
         from: user,
         gas: 80000
       });
 
-      await grap.contracts.uni_router.methods.addLiquidity(
-        grap.contracts.grap.options.address,
-        grap.contracts.ycrv.options.address,
+      await krap.contracts.uni_router.methods.addLiquidity(
+        krap.contracts.krap.options.address,
+        krap.contracts.ycrv.options.address,
         "1000000000000000000000000",
         "1000000000000000000000000",
         "1000000000000000000000000",
@@ -268,21 +268,21 @@ describe("rebase_tests", () => {
         gas: 8000000
       });
 
-      let pair = await grap.contracts.uni_fact.methods.getPair(
-        grap.contracts.grap.options.address,
-        grap.contracts.ycrv.options.address
+      let pair = await krap.contracts.uni_fact.methods.getPair(
+        krap.contracts.krap.options.address,
+        krap.contracts.ycrv.options.address
       ).call();
 
-      grap.contracts.uni_pair.options.address = pair;
-      let bal = await grap.contracts.uni_pair.methods.balanceOf(user).call();
+      krap.contracts.uni_pair.options.address = pair;
+      let bal = await krap.contracts.uni_pair.methods.balanceOf(user).call();
 
       // make a trade to get init values in uniswap
-      await grap.contracts.uni_router.methods.swapExactTokensForTokens(
+      await krap.contracts.uni_router.methods.swapExactTokensForTokens(
         "100000000000",
         100000,
         [
-          grap.contracts.ycrv.options.address,
-          grap.contracts.grap.options.address
+          krap.contracts.ycrv.options.address,
+          krap.contracts.krap.options.address
         ],
         user,
         1596740361 + 10000000
@@ -292,12 +292,12 @@ describe("rebase_tests", () => {
       });
 
       // trade back for easier calcs later
-      await grap.contracts.uni_router.methods.swapExactTokensForTokens(
+      await krap.contracts.uni_router.methods.swapExactTokensForTokens(
         "100000000000",
         100000,
         [
-          grap.contracts.grap.options.address,
-          grap.contracts.ycrv.options.address
+          krap.contracts.krap.options.address,
+          krap.contracts.ycrv.options.address
         ],
         user,
         1596740361 + 10000000
@@ -306,20 +306,20 @@ describe("rebase_tests", () => {
         gas: 1000000
       });
 
-      await grap.testing.increaseTime(43200);
+      await krap.testing.increaseTime(43200);
 
-      await grap.contracts.rebaser.methods.init_twap().send({
+      await krap.contracts.rebaser.methods.init_twap().send({
         from: user,
         gas: 500000
       });
 
 
-      await grap.contracts.uni_router.methods.swapExactTokensForTokens(
+      await krap.contracts.uni_router.methods.swapExactTokensForTokens(
         "100000000000000000000000",
         100000,
         [
-          grap.contracts.ycrv.options.address,
-          grap.contracts.grap.options.address
+          krap.contracts.ycrv.options.address,
+          krap.contracts.krap.options.address
         ],
         user,
         1596740361 + 10000000
@@ -329,18 +329,18 @@ describe("rebase_tests", () => {
       });
 
       // init twap
-      let init_twap = await grap.contracts.rebaser.methods.timeOfTWAPInit().call();
+      let init_twap = await krap.contracts.rebaser.methods.timeOfTWAPInit().call();
 
       // wait 12 hours
-      await grap.testing.increaseTime(12 * 60 * 60);
+      await krap.testing.increaseTime(12 * 60 * 60);
 
       // perform trade to change price
-      await grap.contracts.uni_router.methods.swapExactTokensForTokens(
+      await krap.contracts.uni_router.methods.swapExactTokensForTokens(
         "10000000000000000000",
         100000,
         [
-          grap.contracts.ycrv.options.address,
-          grap.contracts.grap.options.address
+          krap.contracts.ycrv.options.address,
+          krap.contracts.krap.options.address
         ],
         user,
         1596740361 + 10000000
@@ -350,26 +350,26 @@ describe("rebase_tests", () => {
       });
 
       // activate rebasing
-      await grap.contracts.rebaser.methods.activate_rebasing().send({
+      await krap.contracts.rebaser.methods.activate_rebasing().send({
         from: user,
         gas: 500000
       });
 
 
-      let res_bal = await grap.contracts.grap.methods.balanceOf(
-          grap.contracts.reserves.options.address
+      let res_bal = await krap.contracts.krap.methods.balanceOf(
+          krap.contracts.reserves.options.address
       ).call();
 
       expect(res_bal).toBe("0");
 
-      bal = await grap.contracts.grap.methods.balanceOf(user).call();
+      bal = await krap.contracts.krap.methods.balanceOf(user).call();
 
-      let a = await grap.web3.eth.getBlock('latest');
+      let a = await krap.web3.eth.getBlock('latest');
 
-      let offset = await grap.contracts.rebaser.methods.rebaseWindowOffsetSec().call();
-      offset = grap.toBigN(offset).toNumber();
-      let interval = await grap.contracts.rebaser.methods.minRebaseTimeIntervalSec().call();
-      interval = grap.toBigN(interval).toNumber();
+      let offset = await krap.contracts.rebaser.methods.rebaseWindowOffsetSec().call();
+      offset = krap.toBigN(offset).toNumber();
+      let interval = await krap.contracts.rebaser.methods.minRebaseTimeIntervalSec().call();
+      interval = krap.toBigN(interval).toNumber();
 
       let i;
       if (a["timestamp"] % interval > offset) {
@@ -378,13 +378,13 @@ describe("rebase_tests", () => {
         i = offset - (a["timestamp"] % interval);
       }
 
-      await grap.testing.increaseTime(i);
+      await krap.testing.increaseTime(i);
 
-      let r = await grap.contracts.uni_pair.methods.getReserves().call();
-      let q = await grap.contracts.uni_router.methods.quote(grap.toBigN(10**18).toString(), r[0], r[1]).call();
+      let r = await krap.contracts.uni_pair.methods.getReserves().call();
+      let q = await krap.contracts.uni_router.methods.quote(krap.toBigN(10**18).toString(), r[0], r[1]).call();
       console.log("quote pre positive rebase", q);
 
-      let b = await grap.contracts.rebaser.methods.rebase().send({
+      let b = await krap.contracts.rebaser.methods.rebase().send({
         from: user,
         gas: 2500000
       });
@@ -392,47 +392,47 @@ describe("rebase_tests", () => {
       //console.log(b.events)
       console.log("positive rebase gas used:", b["gasUsed"]);
 
-      let bal1 = await grap.contracts.grap.methods.balanceOf(user).call();
+      let bal1 = await krap.contracts.krap.methods.balanceOf(user).call();
 
-      let resGRAP = await grap.contracts.grap.methods.balanceOf(grap.contracts.reserves.options.address).call();
+      let resKRAP = await krap.contracts.krap.methods.balanceOf(krap.contracts.reserves.options.address).call();
 
-      let resycrv = await grap.contracts.ycrv.methods.balanceOf(grap.contracts.reserves.options.address).call();
+      let resycrv = await krap.contracts.ycrv.methods.balanceOf(krap.contracts.reserves.options.address).call();
 
-      console.log("bal user, bal grap res, bal res crv", bal1, resGRAP, resycrv);
-      r = await grap.contracts.uni_pair.methods.getReserves().call();
-      q = await grap.contracts.uni_router.methods.quote(grap.toBigN(10**18).toString(), r[0], r[1]).call();
+      console.log("bal user, bal krap res, bal res crv", bal1, resKRAP, resycrv);
+      r = await krap.contracts.uni_pair.methods.getReserves().call();
+      q = await krap.contracts.uni_router.methods.quote(krap.toBigN(10**18).toString(), r[0], r[1]).call();
       console.log("post positive rebase quote", q);
 
       // new balance > old balance
-      expect(grap.toBigN(bal).toNumber()).toBeLessThan(grap.toBigN(bal1).toNumber());
-      // used full grap reserves
-      expect(grap.toBigN(resGRAP).toNumber()).toBe(0);
+      expect(krap.toBigN(bal).toNumber()).toBeLessThan(krap.toBigN(bal1).toNumber());
+      // used full krap reserves
+      expect(krap.toBigN(resKRAP).toNumber()).toBe(0);
       // increases reserves
-      expect(grap.toBigN(resycrv).toNumber()).toBeGreaterThan(0);
+      expect(krap.toBigN(resycrv).toNumber()).toBeGreaterThan(0);
 
 
       // not below peg
-      expect(grap.toBigN(q).toNumber()).toBeGreaterThan(grap.toBigN(10**18).toNumber());
+      expect(krap.toBigN(q).toNumber()).toBeGreaterThan(krap.toBigN(10**18).toNumber());
     });
     test("negative rebasing", async () => {
-      await grap.contracts.grap.methods.approve(
-        grap.contracts.uni_router.options.address,
+      await krap.contracts.krap.methods.approve(
+        krap.contracts.uni_router.options.address,
         -1
       ).send({
         from: user,
         gas: 80000
       });
-      await grap.contracts.ycrv.methods.approve(
-        grap.contracts.uni_router.options.address,
+      await krap.contracts.ycrv.methods.approve(
+        krap.contracts.uni_router.options.address,
         -1
       ).send({
         from: user,
         gas: 80000
       });
 
-      await grap.contracts.uni_router.methods.addLiquidity(
-        grap.contracts.grap.options.address,
-        grap.contracts.ycrv.options.address,
+      await krap.contracts.uni_router.methods.addLiquidity(
+        krap.contracts.krap.options.address,
+        krap.contracts.ycrv.options.address,
         "1000000000000000000000000",
         "1000000000000000000000000",
         "1000000000000000000000000",
@@ -444,21 +444,21 @@ describe("rebase_tests", () => {
         gas: 8000000
       });
 
-      let pair = await grap.contracts.uni_fact.methods.getPair(
-        grap.contracts.grap.options.address,
-        grap.contracts.ycrv.options.address
+      let pair = await krap.contracts.uni_fact.methods.getPair(
+        krap.contracts.krap.options.address,
+        krap.contracts.ycrv.options.address
       ).call();
 
-      grap.contracts.uni_pair.options.address = pair;
-      let bal = await grap.contracts.uni_pair.methods.balanceOf(user).call();
+      krap.contracts.uni_pair.options.address = pair;
+      let bal = await krap.contracts.uni_pair.methods.balanceOf(user).call();
 
       // make a trade to get init values in uniswap
-      await grap.contracts.uni_router.methods.swapExactTokensForTokens(
+      await krap.contracts.uni_router.methods.swapExactTokensForTokens(
         "100000000000",
         100000,
         [
-          grap.contracts.ycrv.options.address,
-          grap.contracts.grap.options.address
+          krap.contracts.ycrv.options.address,
+          krap.contracts.krap.options.address
         ],
         user,
         1596740361 + 10000000
@@ -468,12 +468,12 @@ describe("rebase_tests", () => {
       });
 
       // trade back for easier calcs later
-      await grap.contracts.uni_router.methods.swapExactTokensForTokens(
+      await krap.contracts.uni_router.methods.swapExactTokensForTokens(
         "100000000000",
         100000,
         [
-          grap.contracts.grap.options.address,
-          grap.contracts.ycrv.options.address
+          krap.contracts.krap.options.address,
+          krap.contracts.ycrv.options.address
         ],
         user,
         1596740361 + 10000000
@@ -482,20 +482,20 @@ describe("rebase_tests", () => {
         gas: 1000000
       });
 
-      await grap.testing.increaseTime(43200);
+      await krap.testing.increaseTime(43200);
 
-      await grap.contracts.rebaser.methods.init_twap().send({
+      await krap.contracts.rebaser.methods.init_twap().send({
         from: user,
         gas: 500000
       });
 
 
-      await grap.contracts.uni_router.methods.swapExactTokensForTokens(
+      await krap.contracts.uni_router.methods.swapExactTokensForTokens(
         "500000000000000000000000",
         100000,
         [
-          grap.contracts.grap.options.address,
-          grap.contracts.ycrv.options.address
+          krap.contracts.krap.options.address,
+          krap.contracts.ycrv.options.address
         ],
         user,
         1596740361 + 10000000
@@ -505,18 +505,18 @@ describe("rebase_tests", () => {
       });
 
       // init twap
-      let init_twap = await grap.contracts.rebaser.methods.timeOfTWAPInit().call();
+      let init_twap = await krap.contracts.rebaser.methods.timeOfTWAPInit().call();
 
       // wait 12 hours
-      await grap.testing.increaseTime(12 * 60 * 60);
+      await krap.testing.increaseTime(12 * 60 * 60);
 
       // perform trade to change price
-      await grap.contracts.uni_router.methods.swapExactTokensForTokens(
+      await krap.contracts.uni_router.methods.swapExactTokensForTokens(
         "10000000000000000000",
         100000,
         [
-          grap.contracts.grap.options.address,
-          grap.contracts.ycrv.options.address
+          krap.contracts.krap.options.address,
+          krap.contracts.ycrv.options.address
         ],
         user,
         1596740361 + 10000000
@@ -526,20 +526,20 @@ describe("rebase_tests", () => {
       });
 
       // activate rebasing
-      await grap.contracts.rebaser.methods.activate_rebasing().send({
+      await krap.contracts.rebaser.methods.activate_rebasing().send({
         from: user,
         gas: 500000
       });
 
 
-      bal = await grap.contracts.grap.methods.balanceOf(user).call();
+      bal = await krap.contracts.krap.methods.balanceOf(user).call();
 
-      let a = await grap.web3.eth.getBlock('latest');
+      let a = await krap.web3.eth.getBlock('latest');
 
-      let offset = await grap.contracts.rebaser.methods.rebaseWindowOffsetSec().call();
-      offset = grap.toBigN(offset).toNumber();
-      let interval = await grap.contracts.rebaser.methods.minRebaseTimeIntervalSec().call();
-      interval = grap.toBigN(interval).toNumber();
+      let offset = await krap.contracts.rebaser.methods.rebaseWindowOffsetSec().call();
+      offset = krap.toBigN(offset).toNumber();
+      let interval = await krap.contracts.rebaser.methods.minRebaseTimeIntervalSec().call();
+      interval = krap.toBigN(interval).toNumber();
 
       let i;
       if (a["timestamp"] % interval > offset) {
@@ -548,13 +548,13 @@ describe("rebase_tests", () => {
         i = offset - (a["timestamp"] % interval);
       }
 
-      await grap.testing.increaseTime(i);
+      await krap.testing.increaseTime(i);
 
-      let r = await grap.contracts.uni_pair.methods.getReserves().call();
-      let q = await grap.contracts.uni_router.methods.quote(grap.toBigN(10**18).toString(), r[0], r[1]).call();
+      let r = await krap.contracts.uni_pair.methods.getReserves().call();
+      let q = await krap.contracts.uni_router.methods.quote(krap.toBigN(10**18).toString(), r[0], r[1]).call();
       console.log("quote pre negative rebase", q);
 
-      let b = await grap.contracts.rebaser.methods.rebase().send({
+      let b = await krap.contracts.rebaser.methods.rebase().send({
         from: user,
         gas: 2500000
       });
@@ -562,37 +562,37 @@ describe("rebase_tests", () => {
       //console.log(b.events)
       console.log("negative rebase gas used:", b["gasUsed"]);
 
-      let bal1 = await grap.contracts.grap.methods.balanceOf(user).call();
+      let bal1 = await krap.contracts.krap.methods.balanceOf(user).call();
 
-      let resGRAP = await grap.contracts.grap.methods.balanceOf(grap.contracts.reserves.options.address).call();
+      let resKRAP = await krap.contracts.krap.methods.balanceOf(krap.contracts.reserves.options.address).call();
 
-      let resycrv = await grap.contracts.ycrv.methods.balanceOf(grap.contracts.reserves.options.address).call();
+      let resycrv = await krap.contracts.ycrv.methods.balanceOf(krap.contracts.reserves.options.address).call();
 
       // balance decreases
-      expect(grap.toBigN(bal1).toNumber()).toBeLessThan(grap.toBigN(bal).toNumber());
+      expect(krap.toBigN(bal1).toNumber()).toBeLessThan(krap.toBigN(bal).toNumber());
       // no increases to reserves
-      expect(grap.toBigN(resGRAP).toNumber()).toBe(0);
-      expect(grap.toBigN(resycrv).toNumber()).toBe(0);
+      expect(krap.toBigN(resKRAP).toNumber()).toBe(0);
+      expect(krap.toBigN(resycrv).toNumber()).toBe(0);
     });
     test("no rebasing", async () => {
-      await grap.contracts.grap.methods.approve(
-        grap.contracts.uni_router.options.address,
+      await krap.contracts.krap.methods.approve(
+        krap.contracts.uni_router.options.address,
         -1
       ).send({
         from: user,
         gas: 80000
       });
-      await grap.contracts.ycrv.methods.approve(
-        grap.contracts.uni_router.options.address,
+      await krap.contracts.ycrv.methods.approve(
+        krap.contracts.uni_router.options.address,
         -1
       ).send({
         from: user,
         gas: 80000
       });
 
-      await grap.contracts.uni_router.methods.addLiquidity(
-        grap.contracts.grap.options.address,
-        grap.contracts.ycrv.options.address,
+      await krap.contracts.uni_router.methods.addLiquidity(
+        krap.contracts.krap.options.address,
+        krap.contracts.ycrv.options.address,
         "1000000000000000000000000",
         "1000000000000000000000000",
         "1000000000000000000000000",
@@ -604,21 +604,21 @@ describe("rebase_tests", () => {
         gas: 8000000
       });
 
-      let pair = await grap.contracts.uni_fact.methods.getPair(
-        grap.contracts.grap.options.address,
-        grap.contracts.ycrv.options.address
+      let pair = await krap.contracts.uni_fact.methods.getPair(
+        krap.contracts.krap.options.address,
+        krap.contracts.ycrv.options.address
       ).call();
 
-      grap.contracts.uni_pair.options.address = pair;
-      let bal = await grap.contracts.uni_pair.methods.balanceOf(user).call();
+      krap.contracts.uni_pair.options.address = pair;
+      let bal = await krap.contracts.uni_pair.methods.balanceOf(user).call();
 
       // make a trade to get init values in uniswap
-      await grap.contracts.uni_router.methods.swapExactTokensForTokens(
+      await krap.contracts.uni_router.methods.swapExactTokensForTokens(
         "100000000000",
         100000,
         [
-          grap.contracts.ycrv.options.address,
-          grap.contracts.grap.options.address
+          krap.contracts.ycrv.options.address,
+          krap.contracts.krap.options.address
         ],
         user,
         1596740361 + 10000000
@@ -628,12 +628,12 @@ describe("rebase_tests", () => {
       });
 
       // trade back for easier calcs later
-      await grap.contracts.uni_router.methods.swapExactTokensForTokens(
+      await krap.contracts.uni_router.methods.swapExactTokensForTokens(
         "100000000000",
         100000,
         [
-          grap.contracts.grap.options.address,
-          grap.contracts.ycrv.options.address
+          krap.contracts.krap.options.address,
+          krap.contracts.ycrv.options.address
         ],
         user,
         1596740361 + 10000000
@@ -642,20 +642,20 @@ describe("rebase_tests", () => {
         gas: 1000000
       });
 
-      await grap.testing.increaseTime(43200);
+      await krap.testing.increaseTime(43200);
 
-      await grap.contracts.rebaser.methods.init_twap().send({
+      await krap.contracts.rebaser.methods.init_twap().send({
         from: user,
         gas: 500000
       });
 
 
-      await grap.contracts.uni_router.methods.swapExactTokensForTokens(
+      await krap.contracts.uni_router.methods.swapExactTokensForTokens(
         "10000000000000000000000",
         100000,
         [
-          grap.contracts.grap.options.address,
-          grap.contracts.ycrv.options.address
+          krap.contracts.krap.options.address,
+          krap.contracts.ycrv.options.address
         ],
         user,
         1596740361 + 10000000
@@ -664,12 +664,12 @@ describe("rebase_tests", () => {
         gas: 1000000
       });
 
-      await grap.contracts.uni_router.methods.swapExactTokensForTokens(
+      await krap.contracts.uni_router.methods.swapExactTokensForTokens(
         "10000000000000000000000",
         100000,
         [
-          grap.contracts.ycrv.options.address,
-          grap.contracts.grap.options.address
+          krap.contracts.ycrv.options.address,
+          krap.contracts.krap.options.address
         ],
         user,
         1596740361 + 10000000
@@ -679,18 +679,18 @@ describe("rebase_tests", () => {
       });
 
       // init twap
-      let init_twap = await grap.contracts.rebaser.methods.timeOfTWAPInit().call();
+      let init_twap = await krap.contracts.rebaser.methods.timeOfTWAPInit().call();
 
       // wait 12 hours
-      await grap.testing.increaseTime(12 * 60 * 60);
+      await krap.testing.increaseTime(12 * 60 * 60);
 
       // perform trade to change price
-      await grap.contracts.uni_router.methods.swapExactTokensForTokens(
+      await krap.contracts.uni_router.methods.swapExactTokensForTokens(
         "10000000000000000000",
         100000,
         [
-          grap.contracts.grap.options.address,
-          grap.contracts.ycrv.options.address
+          krap.contracts.krap.options.address,
+          krap.contracts.ycrv.options.address
         ],
         user,
         1596740361 + 10000000
@@ -699,12 +699,12 @@ describe("rebase_tests", () => {
         gas: 1000000
       });
 
-      await grap.contracts.uni_router.methods.swapExactTokensForTokens(
+      await krap.contracts.uni_router.methods.swapExactTokensForTokens(
         "10000000000000000000",
         100000,
         [
-          grap.contracts.ycrv.options.address,
-          grap.contracts.grap.options.address
+          krap.contracts.ycrv.options.address,
+          krap.contracts.krap.options.address
         ],
         user,
         1596740361 + 10000000
@@ -714,20 +714,20 @@ describe("rebase_tests", () => {
       });
 
       // activate rebasing
-      await grap.contracts.rebaser.methods.activate_rebasing().send({
+      await krap.contracts.rebaser.methods.activate_rebasing().send({
         from: user,
         gas: 500000
       });
 
 
-      bal = await grap.contracts.grap.methods.balanceOf(user).call();
+      bal = await krap.contracts.krap.methods.balanceOf(user).call();
 
-      let a = await grap.web3.eth.getBlock('latest');
+      let a = await krap.web3.eth.getBlock('latest');
 
-      let offset = await grap.contracts.rebaser.methods.rebaseWindowOffsetSec().call();
-      offset = grap.toBigN(offset).toNumber();
-      let interval = await grap.contracts.rebaser.methods.minRebaseTimeIntervalSec().call();
-      interval = grap.toBigN(interval).toNumber();
+      let offset = await krap.contracts.rebaser.methods.rebaseWindowOffsetSec().call();
+      offset = krap.toBigN(offset).toNumber();
+      let interval = await krap.contracts.rebaser.methods.minRebaseTimeIntervalSec().call();
+      interval = krap.toBigN(interval).toNumber();
 
       let i;
       if (a["timestamp"] % interval > offset) {
@@ -736,54 +736,54 @@ describe("rebase_tests", () => {
         i = offset - (a["timestamp"] % interval);
       }
 
-      await grap.testing.increaseTime(i);
+      await krap.testing.increaseTime(i);
 
-      let r = await grap.contracts.uni_pair.methods.getReserves().call();
+      let r = await krap.contracts.uni_pair.methods.getReserves().call();
       console.log(r, r[0], r[1]);
-      let q = await grap.contracts.uni_router.methods.quote(grap.toBigN(10**18).toString(), r[0], r[1]).call();
+      let q = await krap.contracts.uni_router.methods.quote(krap.toBigN(10**18).toString(), r[0], r[1]).call();
       console.log("quote pre no rebase", q);
-      let b = await grap.contracts.rebaser.methods.rebase().send({
+      let b = await krap.contracts.rebaser.methods.rebase().send({
         from: user,
         gas: 2500000
       });
 
       console.log("no rebase gas used:", b["gasUsed"]);
 
-      let bal1 = await grap.contracts.grap.methods.balanceOf(user).call();
+      let bal1 = await krap.contracts.krap.methods.balanceOf(user).call();
 
-      let resGRAP = await grap.contracts.grap.methods.balanceOf(grap.contracts.reserves.options.address).call();
+      let resKRAP = await krap.contracts.krap.methods.balanceOf(krap.contracts.reserves.options.address).call();
 
-      let resycrv = await grap.contracts.ycrv.methods.balanceOf(grap.contracts.reserves.options.address).call();
+      let resycrv = await krap.contracts.ycrv.methods.balanceOf(krap.contracts.reserves.options.address).call();
 
       // no change
-      expect(grap.toBigN(bal1).toNumber()).toBe(grap.toBigN(bal).toNumber());
+      expect(krap.toBigN(bal1).toNumber()).toBe(krap.toBigN(bal).toNumber());
       // no increases to reserves
-      expect(grap.toBigN(resGRAP).toNumber()).toBe(0);
-      expect(grap.toBigN(resycrv).toNumber()).toBe(0);
-      r = await grap.contracts.uni_pair.methods.getReserves().call();
-      q = await grap.contracts.uni_router.methods.quote(grap.toBigN(10**18).toString(), r[0], r[1]).call();
+      expect(krap.toBigN(resKRAP).toNumber()).toBe(0);
+      expect(krap.toBigN(resycrv).toNumber()).toBe(0);
+      r = await krap.contracts.uni_pair.methods.getReserves().call();
+      q = await krap.contracts.uni_router.methods.quote(krap.toBigN(10**18).toString(), r[0], r[1]).call();
       console.log("quote post no rebase", q);
     });
-    test("rebasing with GRAP in reserves", async () => {
-      await grap.contracts.grap.methods.transfer(grap.contracts.reserves.options.address, grap.toBigN(60000*10**18).toString()).send({from: user});
-      await grap.contracts.grap.methods.approve(
-        grap.contracts.uni_router.options.address,
+    test("rebasing with KRAP in reserves", async () => {
+      await krap.contracts.krap.methods.transfer(krap.contracts.reserves.options.address, krap.toBigN(60000*10**18).toString()).send({from: user});
+      await krap.contracts.krap.methods.approve(
+        krap.contracts.uni_router.options.address,
         -1
       ).send({
         from: user,
         gas: 80000
       });
-      await grap.contracts.ycrv.methods.approve(
-        grap.contracts.uni_router.options.address,
+      await krap.contracts.ycrv.methods.approve(
+        krap.contracts.uni_router.options.address,
         -1
       ).send({
         from: user,
         gas: 80000
       });
 
-      await grap.contracts.uni_router.methods.addLiquidity(
-        grap.contracts.grap.options.address,
-        grap.contracts.ycrv.options.address,
+      await krap.contracts.uni_router.methods.addLiquidity(
+        krap.contracts.krap.options.address,
+        krap.contracts.ycrv.options.address,
         "1000000000000000000000000",
         "1000000000000000000000000",
         "1000000000000000000000000",
@@ -795,21 +795,21 @@ describe("rebase_tests", () => {
         gas: 8000000
       });
 
-      let pair = await grap.contracts.uni_fact.methods.getPair(
-        grap.contracts.grap.options.address,
-        grap.contracts.ycrv.options.address
+      let pair = await krap.contracts.uni_fact.methods.getPair(
+        krap.contracts.krap.options.address,
+        krap.contracts.ycrv.options.address
       ).call();
 
-      grap.contracts.uni_pair.options.address = pair;
-      let bal = await grap.contracts.uni_pair.methods.balanceOf(user).call();
+      krap.contracts.uni_pair.options.address = pair;
+      let bal = await krap.contracts.uni_pair.methods.balanceOf(user).call();
 
       // make a trade to get init values in uniswap
-      await grap.contracts.uni_router.methods.swapExactTokensForTokens(
+      await krap.contracts.uni_router.methods.swapExactTokensForTokens(
         "100000000000",
         100000,
         [
-          grap.contracts.ycrv.options.address,
-          grap.contracts.grap.options.address
+          krap.contracts.ycrv.options.address,
+          krap.contracts.krap.options.address
         ],
         user,
         1596740361 + 10000000
@@ -819,12 +819,12 @@ describe("rebase_tests", () => {
       });
 
       // trade back for easier calcs later
-      await grap.contracts.uni_router.methods.swapExactTokensForTokens(
+      await krap.contracts.uni_router.methods.swapExactTokensForTokens(
         "100000000000",
         100000,
         [
-          grap.contracts.grap.options.address,
-          grap.contracts.ycrv.options.address
+          krap.contracts.krap.options.address,
+          krap.contracts.ycrv.options.address
         ],
         user,
         1596740361 + 10000000
@@ -833,20 +833,20 @@ describe("rebase_tests", () => {
         gas: 1000000
       });
 
-      await grap.testing.increaseTime(43200);
+      await krap.testing.increaseTime(43200);
 
-      await grap.contracts.rebaser.methods.init_twap().send({
+      await krap.contracts.rebaser.methods.init_twap().send({
         from: user,
         gas: 500000
       });
 
 
-      await grap.contracts.uni_router.methods.swapExactTokensForTokens(
+      await krap.contracts.uni_router.methods.swapExactTokensForTokens(
         "500000000000000000000000",
         100000,
         [
-          grap.contracts.ycrv.options.address,
-          grap.contracts.grap.options.address
+          krap.contracts.ycrv.options.address,
+          krap.contracts.krap.options.address
         ],
         user,
         1596740361 + 10000000
@@ -856,18 +856,18 @@ describe("rebase_tests", () => {
       });
 
       // init twap
-      let init_twap = await grap.contracts.rebaser.methods.timeOfTWAPInit().call();
+      let init_twap = await krap.contracts.rebaser.methods.timeOfTWAPInit().call();
 
       // wait 12 hours
-      await grap.testing.increaseTime(12 * 60 * 60);
+      await krap.testing.increaseTime(12 * 60 * 60);
 
       // perform trade to change price
-      await grap.contracts.uni_router.methods.swapExactTokensForTokens(
+      await krap.contracts.uni_router.methods.swapExactTokensForTokens(
         "10000000000000000000",
         100000,
         [
-          grap.contracts.ycrv.options.address,
-          grap.contracts.grap.options.address
+          krap.contracts.ycrv.options.address,
+          krap.contracts.krap.options.address
         ],
         user,
         1596740361 + 10000000
@@ -877,20 +877,20 @@ describe("rebase_tests", () => {
       });
 
       // activate rebasing
-      await grap.contracts.rebaser.methods.activate_rebasing().send({
+      await krap.contracts.rebaser.methods.activate_rebasing().send({
         from: user,
         gas: 500000
       });
 
 
-      bal = await grap.contracts.grap.methods.balanceOf(user).call();
+      bal = await krap.contracts.krap.methods.balanceOf(user).call();
 
-      let a = await grap.web3.eth.getBlock('latest');
+      let a = await krap.web3.eth.getBlock('latest');
 
-      let offset = await grap.contracts.rebaser.methods.rebaseWindowOffsetSec().call();
-      offset = grap.toBigN(offset).toNumber();
-      let interval = await grap.contracts.rebaser.methods.minRebaseTimeIntervalSec().call();
-      interval = grap.toBigN(interval).toNumber();
+      let offset = await krap.contracts.rebaser.methods.rebaseWindowOffsetSec().call();
+      offset = krap.toBigN(offset).toNumber();
+      let interval = await krap.contracts.rebaser.methods.minRebaseTimeIntervalSec().call();
+      interval = krap.toBigN(interval).toNumber();
 
       let i;
       if (a["timestamp"] % interval > offset) {
@@ -899,14 +899,14 @@ describe("rebase_tests", () => {
         i = offset - (a["timestamp"] % interval);
       }
 
-      await grap.testing.increaseTime(i);
+      await krap.testing.increaseTime(i);
 
 
-      let r = await grap.contracts.uni_pair.methods.getReserves().call();
-      let q = await grap.contracts.uni_router.methods.quote(grap.toBigN(10**18).toString(), r[0], r[1]).call();
+      let r = await krap.contracts.uni_pair.methods.getReserves().call();
+      let q = await krap.contracts.uni_router.methods.quote(krap.toBigN(10**18).toString(), r[0], r[1]).call();
       console.log("quote pre pos rebase with reserves", q);
 
-      let b = await grap.contracts.rebaser.methods.rebase().send({
+      let b = await krap.contracts.rebaser.methods.rebase().send({
         from: user,
         gas: 2500000
       });
@@ -914,55 +914,55 @@ describe("rebase_tests", () => {
 
       console.log("positive  with reserves gas used:", b["gasUsed"]);
 
-      let bal1 = await grap.contracts.grap.methods.balanceOf(user).call();
+      let bal1 = await krap.contracts.krap.methods.balanceOf(user).call();
 
-      let resGRAP = await grap.contracts.grap.methods.balanceOf(grap.contracts.reserves.options.address).call();
+      let resKRAP = await krap.contracts.krap.methods.balanceOf(krap.contracts.reserves.options.address).call();
 
-      let resycrv = await grap.contracts.ycrv.methods.balanceOf(grap.contracts.reserves.options.address).call();
+      let resycrv = await krap.contracts.ycrv.methods.balanceOf(krap.contracts.reserves.options.address).call();
 
-      console.log(bal, bal1, resGRAP, resycrv);
-      expect(grap.toBigN(bal).toNumber()).toBeLessThan(grap.toBigN(bal1).toNumber());
-      expect(grap.toBigN(resGRAP).toNumber()).toBeGreaterThan(0);
-      expect(grap.toBigN(resycrv).toNumber()).toBeGreaterThan(0);
-      r = await grap.contracts.uni_pair.methods.getReserves().call();
-      q = await grap.contracts.uni_router.methods.quote(grap.toBigN(10**18).toString(), r[0], r[1]).call();
+      console.log(bal, bal1, resKRAP, resycrv);
+      expect(krap.toBigN(bal).toNumber()).toBeLessThan(krap.toBigN(bal1).toNumber());
+      expect(krap.toBigN(resKRAP).toNumber()).toBeGreaterThan(0);
+      expect(krap.toBigN(resycrv).toNumber()).toBeGreaterThan(0);
+      r = await krap.contracts.uni_pair.methods.getReserves().call();
+      q = await krap.contracts.uni_router.methods.quote(krap.toBigN(10**18).toString(), r[0], r[1]).call();
       console.log("quote post rebase w/ reserves", q);
-      expect(grap.toBigN(q).toNumber()).toBeGreaterThan(grap.toBigN(10**18).toNumber());
+      expect(krap.toBigN(q).toNumber()).toBeGreaterThan(krap.toBigN(10**18).toNumber());
     });
   });
 
   describe("failing", () => {
     test("unitialized rebasing", async () => {
-      await grap.testing.expectThrow(grap.contracts.rebaser.methods.activate_rebasing().send({
+      await krap.testing.expectThrow(krap.contracts.rebaser.methods.activate_rebasing().send({
         from: user,
         gas: 500000
       }), "twap wasnt intitiated, call init_twap()");
     });
     test("no early twap", async () => {
-      await grap.testing.expectThrow(grap.contracts.rebaser.methods.init_twap().send({
+      await krap.testing.expectThrow(krap.contracts.rebaser.methods.init_twap().send({
         from: user,
         gas: 500000
       }), "");
     });
     test("too late rebasing", async () => {
-      await grap.contracts.grap.methods.approve(
-        grap.contracts.uni_router.options.address,
+      await krap.contracts.krap.methods.approve(
+        krap.contracts.uni_router.options.address,
         -1
       ).send({
         from: user,
         gas: 80000
       });
-      await grap.contracts.ycrv.methods.approve(
-        grap.contracts.uni_router.options.address,
+      await krap.contracts.ycrv.methods.approve(
+        krap.contracts.uni_router.options.address,
         -1
       ).send({
         from: user,
         gas: 80000
       });
 
-      await grap.contracts.uni_router.methods.addLiquidity(
-        grap.contracts.grap.options.address,
-        grap.contracts.ycrv.options.address,
+      await krap.contracts.uni_router.methods.addLiquidity(
+        krap.contracts.krap.options.address,
+        krap.contracts.ycrv.options.address,
         "1000000000000000000000000",
         "1000000000000000000000000",
         "1000000000000000000000000",
@@ -974,21 +974,21 @@ describe("rebase_tests", () => {
         gas: 8000000
       });
 
-      let pair = await grap.contracts.uni_fact.methods.getPair(
-        grap.contracts.grap.options.address,
-        grap.contracts.ycrv.options.address
+      let pair = await krap.contracts.uni_fact.methods.getPair(
+        krap.contracts.krap.options.address,
+        krap.contracts.ycrv.options.address
       ).call();
 
-      grap.contracts.uni_pair.options.address = pair;
-      let bal = await grap.contracts.uni_pair.methods.balanceOf(user).call();
+      krap.contracts.uni_pair.options.address = pair;
+      let bal = await krap.contracts.uni_pair.methods.balanceOf(user).call();
 
       // make a trade to get init values in uniswap
-      await grap.contracts.uni_router.methods.swapExactTokensForTokens(
+      await krap.contracts.uni_router.methods.swapExactTokensForTokens(
         "100000000000",
         100000,
         [
-          grap.contracts.ycrv.options.address,
-          grap.contracts.grap.options.address
+          krap.contracts.ycrv.options.address,
+          krap.contracts.krap.options.address
         ],
         user,
         1596740361 + 10000000
@@ -998,12 +998,12 @@ describe("rebase_tests", () => {
       });
 
       // trade back for easier calcs later
-      await grap.contracts.uni_router.methods.swapExactTokensForTokens(
+      await krap.contracts.uni_router.methods.swapExactTokensForTokens(
         "100000000000",
         100000,
         [
-          grap.contracts.grap.options.address,
-          grap.contracts.ycrv.options.address
+          krap.contracts.krap.options.address,
+          krap.contracts.ycrv.options.address
         ],
         user,
         1596740361 + 10000000
@@ -1012,20 +1012,20 @@ describe("rebase_tests", () => {
         gas: 1000000
       });
 
-      await grap.testing.increaseTime(43200);
+      await krap.testing.increaseTime(43200);
 
-      await grap.contracts.rebaser.methods.init_twap().send({
+      await krap.contracts.rebaser.methods.init_twap().send({
         from: user,
         gas: 500000
       });
 
 
-      await grap.contracts.uni_router.methods.swapExactTokensForTokens(
+      await krap.contracts.uni_router.methods.swapExactTokensForTokens(
         "500000000000000000000000",
         100000,
         [
-          grap.contracts.ycrv.options.address,
-          grap.contracts.grap.options.address
+          krap.contracts.ycrv.options.address,
+          krap.contracts.krap.options.address
         ],
         user,
         1596740361 + 10000000
@@ -1035,18 +1035,18 @@ describe("rebase_tests", () => {
       });
 
       // init twap
-      let init_twap = await grap.contracts.rebaser.methods.timeOfTWAPInit().call();
+      let init_twap = await krap.contracts.rebaser.methods.timeOfTWAPInit().call();
 
       // wait 12 hours
-      await grap.testing.increaseTime(12 * 60 * 60);
+      await krap.testing.increaseTime(12 * 60 * 60);
 
       // perform trade to change price
-      await grap.contracts.uni_router.methods.swapExactTokensForTokens(
+      await krap.contracts.uni_router.methods.swapExactTokensForTokens(
         "10000000000000000000",
         100000,
         [
-          grap.contracts.ycrv.options.address,
-          grap.contracts.grap.options.address
+          krap.contracts.ycrv.options.address,
+          krap.contracts.krap.options.address
         ],
         user,
         1596740361 + 10000000
@@ -1056,20 +1056,20 @@ describe("rebase_tests", () => {
       });
 
       // activate rebasing
-      await grap.contracts.rebaser.methods.activate_rebasing().send({
+      await krap.contracts.rebaser.methods.activate_rebasing().send({
         from: user,
         gas: 500000
       });
 
 
-      bal = await grap.contracts.grap.methods.balanceOf(user).call();
+      bal = await krap.contracts.krap.methods.balanceOf(user).call();
 
-      let a = await grap.web3.eth.getBlock('latest');
+      let a = await krap.web3.eth.getBlock('latest');
 
-      let offset = await grap.contracts.rebaser.methods.rebaseWindowOffsetSec().call();
-      offset = grap.toBigN(offset).toNumber();
-      let interval = await grap.contracts.rebaser.methods.minRebaseTimeIntervalSec().call();
-      interval = grap.toBigN(interval).toNumber();
+      let offset = await krap.contracts.rebaser.methods.rebaseWindowOffsetSec().call();
+      offset = krap.toBigN(offset).toNumber();
+      let interval = await krap.contracts.rebaser.methods.minRebaseTimeIntervalSec().call();
+      interval = krap.toBigN(interval).toNumber();
 
       let i;
       if (a["timestamp"] % interval > offset) {
@@ -1078,34 +1078,34 @@ describe("rebase_tests", () => {
         i = offset - (a["timestamp"] % interval);
       }
 
-      let len = await grap.contracts.rebaser.methods.rebaseWindowLengthSec().call();
+      let len = await krap.contracts.rebaser.methods.rebaseWindowLengthSec().call();
 
-      await grap.testing.increaseTime(i + grap.toBigN(len).toNumber()+1);
+      await krap.testing.increaseTime(i + krap.toBigN(len).toNumber()+1);
 
-      let b = await grap.testing.expectThrow(grap.contracts.rebaser.methods.rebase().send({
+      let b = await krap.testing.expectThrow(krap.contracts.rebaser.methods.rebase().send({
         from: user,
         gas: 2500000
       }), "too late");
     });
     test("too early rebasing", async () => {
-      await grap.contracts.grap.methods.approve(
-        grap.contracts.uni_router.options.address,
+      await krap.contracts.krap.methods.approve(
+        krap.contracts.uni_router.options.address,
         -1
       ).send({
         from: user,
         gas: 80000
       });
-      await grap.contracts.ycrv.methods.approve(
-        grap.contracts.uni_router.options.address,
+      await krap.contracts.ycrv.methods.approve(
+        krap.contracts.uni_router.options.address,
         -1
       ).send({
         from: user,
         gas: 80000
       });
 
-      await grap.contracts.uni_router.methods.addLiquidity(
-        grap.contracts.grap.options.address,
-        grap.contracts.ycrv.options.address,
+      await krap.contracts.uni_router.methods.addLiquidity(
+        krap.contracts.krap.options.address,
+        krap.contracts.ycrv.options.address,
         "1000000000000000000000000",
         "1000000000000000000000000",
         "1000000000000000000000000",
@@ -1117,21 +1117,21 @@ describe("rebase_tests", () => {
         gas: 8000000
       });
 
-      let pair = await grap.contracts.uni_fact.methods.getPair(
-        grap.contracts.grap.options.address,
-        grap.contracts.ycrv.options.address
+      let pair = await krap.contracts.uni_fact.methods.getPair(
+        krap.contracts.krap.options.address,
+        krap.contracts.ycrv.options.address
       ).call();
 
-      grap.contracts.uni_pair.options.address = pair;
-      let bal = await grap.contracts.uni_pair.methods.balanceOf(user).call();
+      krap.contracts.uni_pair.options.address = pair;
+      let bal = await krap.contracts.uni_pair.methods.balanceOf(user).call();
 
       // make a trade to get init values in uniswap
-      await grap.contracts.uni_router.methods.swapExactTokensForTokens(
+      await krap.contracts.uni_router.methods.swapExactTokensForTokens(
         "100000000000",
         100000,
         [
-          grap.contracts.ycrv.options.address,
-          grap.contracts.grap.options.address
+          krap.contracts.ycrv.options.address,
+          krap.contracts.krap.options.address
         ],
         user,
         1596740361 + 10000000
@@ -1141,12 +1141,12 @@ describe("rebase_tests", () => {
       });
 
       // trade back for easier calcs later
-      await grap.contracts.uni_router.methods.swapExactTokensForTokens(
+      await krap.contracts.uni_router.methods.swapExactTokensForTokens(
         "100000000000",
         100000,
         [
-          grap.contracts.grap.options.address,
-          grap.contracts.ycrv.options.address
+          krap.contracts.krap.options.address,
+          krap.contracts.ycrv.options.address
         ],
         user,
         1596740361 + 10000000
@@ -1155,20 +1155,20 @@ describe("rebase_tests", () => {
         gas: 1000000
       });
 
-      await grap.testing.increaseTime(43200);
+      await krap.testing.increaseTime(43200);
 
-      await grap.contracts.rebaser.methods.init_twap().send({
+      await krap.contracts.rebaser.methods.init_twap().send({
         from: user,
         gas: 500000
       });
 
 
-      await grap.contracts.uni_router.methods.swapExactTokensForTokens(
+      await krap.contracts.uni_router.methods.swapExactTokensForTokens(
         "500000000000000000000000",
         100000,
         [
-          grap.contracts.ycrv.options.address,
-          grap.contracts.grap.options.address
+          krap.contracts.ycrv.options.address,
+          krap.contracts.krap.options.address
         ],
         user,
         1596740361 + 10000000
@@ -1178,18 +1178,18 @@ describe("rebase_tests", () => {
       });
 
       // init twap
-      let init_twap = await grap.contracts.rebaser.methods.timeOfTWAPInit().call();
+      let init_twap = await krap.contracts.rebaser.methods.timeOfTWAPInit().call();
 
       // wait 12 hours
-      await grap.testing.increaseTime(12 * 60 * 60);
+      await krap.testing.increaseTime(12 * 60 * 60);
 
       // perform trade to change price
-      await grap.contracts.uni_router.methods.swapExactTokensForTokens(
+      await krap.contracts.uni_router.methods.swapExactTokensForTokens(
         "10000000000000000000",
         100000,
         [
-          grap.contracts.ycrv.options.address,
-          grap.contracts.grap.options.address
+          krap.contracts.ycrv.options.address,
+          krap.contracts.krap.options.address
         ],
         user,
         1596740361 + 10000000
@@ -1199,19 +1199,19 @@ describe("rebase_tests", () => {
       });
 
       // activate rebasing
-      await grap.contracts.rebaser.methods.activate_rebasing().send({
+      await krap.contracts.rebaser.methods.activate_rebasing().send({
         from: user,
         gas: 500000
       });
 
-      bal = await grap.contracts.grap.methods.balanceOf(user).call();
+      bal = await krap.contracts.krap.methods.balanceOf(user).call();
 
-      let a = await grap.web3.eth.getBlock('latest');
+      let a = await krap.web3.eth.getBlock('latest');
 
-      let offset = await grap.contracts.rebaser.methods.rebaseWindowOffsetSec().call();
-      offset = grap.toBigN(offset).toNumber();
-      let interval = await grap.contracts.rebaser.methods.minRebaseTimeIntervalSec().call();
-      interval = grap.toBigN(interval).toNumber();
+      let offset = await krap.contracts.rebaser.methods.rebaseWindowOffsetSec().call();
+      offset = krap.toBigN(offset).toNumber();
+      let interval = await krap.contracts.rebaser.methods.minRebaseTimeIntervalSec().call();
+      interval = krap.toBigN(interval).toNumber();
 
       let i;
       if (a["timestamp"] % interval > offset) {
@@ -1220,11 +1220,11 @@ describe("rebase_tests", () => {
         i = offset - (a["timestamp"] % interval);
       }
 
-      await grap.testing.increaseTime(i - 1);
+      await krap.testing.increaseTime(i - 1);
 
 
 
-      let b = await grap.testing.expectThrow(grap.contracts.rebaser.methods.rebase().send({
+      let b = await krap.testing.expectThrow(krap.contracts.rebaser.methods.rebase().send({
         from: user,
         gas: 2500000
       }), "too early");

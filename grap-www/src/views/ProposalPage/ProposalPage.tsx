@@ -12,15 +12,15 @@ import Card from '../../components/Card'
 import CardContent from '../../components/CardContent'
 import Spacer from '../../components/Spacer'
 
-import useGrap from '../../hooks/useGrap'
+import usekrap from '../../hooks/usekrap'
 
 import { getDisplayBalance } from '../../utils/formatBalance'
 
-import { getProposal, getQuorumVotes, getProposalStatus, castVote } from '../../grapUtils'
+import { getProposal, getQuorumVotes, getProposalStatus, castVote } from '../../krapUtils'
 
 import { Proposal, ProposalStatus } from '../../contexts/Proposals'
 
-import {PROPOSALSTATUSCODE} from '../../grap/lib/constants'
+import {PROPOSALSTATUSCODE} from '../../krap/lib/constants'
 
 
 const METER_TOTAL = 80000
@@ -30,41 +30,41 @@ const ProposalPage: React.FC = () => {
   const [proposal, setProposal] =  useState<Proposal>({} as Proposal)
   const [{forVotes, againstVotes, quorumVotes, totalVotes}, setVotes] = useState({forVotes:0, againstVotes:0, totalVotes:0, quorumVotes:0})
   const { account } = useWallet()
-  const grap = useGrap()
+  const krap = usekrap()
 
 
   const handleVoteForClick = useCallback(() => {
-    castVote(grap, proposal.id, true, account )
-  }, [account, grap, proposal.id])
+    castVote(krap, proposal.id, true, account )
+  }, [account, krap, proposal.id])
 
   const handleVoteAgainstClick = useCallback(() => {
-    castVote(grap, proposal.id, false, account )
-  }, [account, grap, proposal.id])
+    castVote(krap, proposal.id, false, account )
+  }, [account, krap, proposal.id])
 
   const fetchProposal = useCallback(async () => {
-    const proposal = await getProposal(grap, proposalId)
+    const proposal = await getProposal(krap, proposalId)
     setProposal(proposal)
-  }, [grap, proposalId])
+  }, [krap, proposalId])
 
   const fetchVotes = useCallback(async () => {
-    const proposalStatus:ProposalStatus = await getProposalStatus(grap, proposalId)
+    const proposalStatus:ProposalStatus = await getProposalStatus(krap, proposalId)
     const forVotes = new BigNumber(proposalStatus.forVotes).div(10**6)
     const againstVotes = new BigNumber(proposalStatus.againstVotes).div(10**6)
-    const quorumCount = await getQuorumVotes(grap)
+    const quorumCount = await getQuorumVotes(krap)
     setVotes({
       forVotes: Number(getDisplayBalance(forVotes)),
       againstVotes: Number(getDisplayBalance(againstVotes)),
       totalVotes: Number(getDisplayBalance(forVotes.plus(againstVotes))),
       quorumVotes: Number(getDisplayBalance(quorumCount))
     })
-  }, [grap, proposalId])
+  }, [krap, proposalId])
 
   useEffect(() => {
-    if (grap) {
+    if (krap) {
       fetchProposal()
       fetchVotes()
     }
-  }, [fetchProposal, fetchVotes, grap])
+  }, [fetchProposal, fetchVotes, krap])
 
   return (
     <Card>

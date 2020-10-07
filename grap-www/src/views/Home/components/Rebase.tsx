@@ -8,17 +8,17 @@ import CardContent from '../../../components/CardContent'
 import Dial from '../../../components/Dial'
 import Label from '../../../components/Label'
 
-import useGrap from '../../../hooks/useGrap'
+import usekrap from '../../../hooks/usekrap'
 import useRebase from '../../../hooks/useRebase'
 
-import { getRebaseStatus } from '../../../grapUtils'
+import { getRebaseStatus } from '../../../krapUtils'
 
 interface RebaseProps {
   nextRebase?: number
 }
 
 const Rebase: React.FC<RebaseProps> = ({ nextRebase }) => {
-  const grap = useGrap()
+  const krap = usekrap()
   const { onRebase } = useRebase()
   const [canRebase, setStats] = useState(Boolean)
 
@@ -32,15 +32,15 @@ const Rebase: React.FC<RebaseProps> = ({ nextRebase }) => {
     )
   }
   const fetchStats = useCallback(async () => {
-    const canRebase = await getRebaseStatus(grap)
+    const canRebase = await getRebaseStatus(krap)
     setStats(canRebase)
-  }, [grap, setStats])
+  }, [krap, setStats])
 
   useEffect(() => {
-    if (grap) {
+    if (krap) {
       fetchStats()
     }
-  }, [fetchStats, grap])
+  }, [fetchStats, krap])
 
   const dialValue = (nextRebase - Date.now()) / (1000 * 60 * 60 * 24) * 100
 

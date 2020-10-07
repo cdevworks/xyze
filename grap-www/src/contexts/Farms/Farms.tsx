@@ -2,9 +2,9 @@ import React, { useCallback, useEffect, useState } from 'react'
 
 import { Contract } from "web3-eth-contract"
 
-import { grap as grapAddress } from '../../constants/tokenAddresses'
-import useGrap from '../../hooks/useGrap'
-import { getPoolContracts } from '../../grapUtils'
+import { krap as krapAddress } from '../../constants/tokenAddresses'
+import usekrap from '../../hooks/usekrap'
+import { getPoolContracts } from '../../krapUtils'
 
 import Context from './context'
 import { Farm } from './types'
@@ -40,10 +40,10 @@ const ICON_FOR_POOL: { [key: string]: string } = {
 const Farms: React.FC = ({ children }) => {
 
   const [farms, setFarms] = useState<Farm[]>([])
-  const grap = useGrap()
+  const krap = usekrap()
 
   const fetchPools = useCallback(async () => {
-    const pools: { [key: string]: Contract} = await getPoolContracts(grap)
+    const pools: { [key: string]: Contract} = await getPoolContracts(krap)
 
     const farmsArr: Farm[] = []
     const poolKeys = Object.keys(pools)
@@ -72,8 +72,8 @@ const Farms: React.FC = ({ children }) => {
             name: NAME_FOR_POOL[poolKey],
             depositToken: tokenKey,
             depositTokenAddress: tokenAddress,
-            earnToken: 'grap',
-            earnTokenAddress: grapAddress,
+            earnToken: 'krap',
+            earnTokenAddress: krapAddress,
             icon: ICON_FOR_POOL[poolKey],
             id: tokenKey
           })
@@ -83,13 +83,13 @@ const Farms: React.FC = ({ children }) => {
       }
     }
     setFarms(farmsArr)
-  }, [grap, setFarms])
+  }, [krap, setFarms])
 
   useEffect(() => {
-    if (grap) {
+    if (krap) {
       fetchPools()
     }
-  }, [grap, fetchPools])
+  }, [krap, fetchPools])
 
   return (
     <Context.Provider value={{ farms }}>

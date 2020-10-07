@@ -15,8 +15,8 @@ export class Account {
     this.walletInfo = {};
   }
 
-  async getGRAPWalletBalance() {
-    this.walletInfo["DAI"] = await this.contracts.grap.methods.balanceOf(this.accountInfo).call();
+  async getKRAPWalletBalance() {
+    this.walletInfo["DAI"] = await this.contracts.krap.methods.balanceOf(this.accountInfo).call();
     return this.walletInfo["DAI"]
   }
 

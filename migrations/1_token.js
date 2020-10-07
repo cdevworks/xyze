@@ -2,8 +2,8 @@
 
 // Token
 // deployed first
-const GRAPImplementation = artifacts.require("GRAPDelegate");
-const GRAPProxy = artifacts.require("GRAPDelegator");
+const KRAPImplementation = artifacts.require("KRAPDelegate");
+const KRAPProxy = artifacts.require("KRAPDelegator");
 
 // ============ Main Migration ============
 
@@ -19,13 +19,13 @@ module.exports = migration;
 
 
 async function deployToken(deployer, network) {
-  await deployer.deploy(GRAPImplementation);
-  await deployer.deploy(GRAPProxy,
-    "GRAP",
-    "GRAP",
+  await deployer.deploy(KRAPImplementation);
+  await deployer.deploy(KRAPProxy,
+    "KRAP",
+    "KRAP",
     18,
     "2000000000000000000000000",
-    GRAPImplementation.address,
+    KRAPImplementation.address,
     "0x"
   );
 }

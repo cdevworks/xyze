@@ -5,30 +5,30 @@ var fs = require('fs')
 
 // Protocol
 // deployed second
-const GRAPImplementation = artifacts.require("GRAPDelegate");
-const GRAPProxy = artifacts.require("GRAPDelegator");
+const KRAPImplementation = artifacts.require("KRAPDelegate");
+const KRAPProxy = artifacts.require("KRAPDelegator");
 
 // deployed third
-const GRAPReserves = artifacts.require("GRAPReserves");
-const GRAPRebaser = artifacts.require("GRAPRebaser");
+const KRAPReserves = artifacts.require("KRAPReserves");
+const KRAPRebaser = artifacts.require("KRAPRebaser");
 
 const Gov = artifacts.require("GovernorAlpha");
 const Timelock = artifacts.require("Timelock");
 
 // deployed fourth
-const GRAP_ETHPool = artifacts.require("GRAPETHPool");
-const GRAP_YAMPool = artifacts.require("GRAPYAMPool");
-const GRAP_YFIPool = artifacts.require("GRAPYFIPool");
-const GRAP_LINKPool = artifacts.require("GRAPLINKPool");
-const GRAP_MKRPool = artifacts.require("GRAPMKRPool");
-const GRAP_LENDPool = artifacts.require("GRAPLENDPool");
-const GRAP_COMPPool = artifacts.require("GRAPCOMPPool");
-const GRAP_SNXPool = artifacts.require("GRAPSNXPool");
-const GRAP_YFIIPool = artifacts.require("GRAPYFIIPool");
-const GRAP_CRVPool = artifacts.require("GRAPCRVPool");
+const KRAP_ETHPool = artifacts.require("KRAPETHPool");
+const KRAP_YAMPool = artifacts.require("KRAPYAMPool");
+const KRAP_YFIPool = artifacts.require("KRAPYFIPool");
+const KRAP_LINKPool = artifacts.require("KRAPLINKPool");
+const KRAP_MKRPool = artifacts.require("KRAPMKRPool");
+const KRAP_LENDPool = artifacts.require("KRAPLENDPool");
+const KRAP_COMPPool = artifacts.require("KRAPCOMPPool");
+const KRAP_SNXPool = artifacts.require("KRAPSNXPool");
+const KRAP_YFIIPool = artifacts.require("KRAPYFIIPool");
+const KRAP_CRVPool = artifacts.require("KRAPCRVPool");
 
 // deployed fifth
-const GRAPIncentivizer = artifacts.require("GRAPIncentivizer");
+const KRAPIncentivizer = artifacts.require("KRAPIncentivizer");
 
 // ============ Main Migration ============
 
@@ -47,35 +47,35 @@ module.exports = migration;
 
 async function deployDistribution(deployer, network, accounts) {
   console.log(network)
-  let grap = await GRAPProxy.deployed();
-  let yReserves = await GRAPReserves.deployed()
-  let yRebaser = await GRAPRebaser.deployed()
+  let krap = await KRAPProxy.deployed();
+  let yReserves = await KRAPReserves.deployed()
+  let yRebaser = await KRAPRebaser.deployed()
   let tl = await Timelock.deployed();
   let gov = await Gov.deployed();
   if (network != "test") {
-    await deployer.deploy(GRAP_ETHPool);
-    await deployer.deploy(GRAP_YAMPool);
-    await deployer.deploy(GRAP_YFIPool);
-    await deployer.deploy(GRAPIncentivizer);
-    await deployer.deploy(GRAP_LINKPool);
-    await deployer.deploy(GRAP_MKRPool);
-    await deployer.deploy(GRAP_LENDPool);
-    await deployer.deploy(GRAP_COMPPool);
-    await deployer.deploy(GRAP_SNXPool);
-    await deployer.deploy(GRAP_YFIIPool);
-    await deployer.deploy(GRAP_CRVPool);
+    await deployer.deploy(KRAP_ETHPool);
+    await deployer.deploy(KRAP_YAMPool);
+    await deployer.deploy(KRAP_YFIPool);
+    await deployer.deploy(KRAPIncentivizer);
+    await deployer.deploy(KRAP_LINKPool);
+    await deployer.deploy(KRAP_MKRPool);
+    await deployer.deploy(KRAP_LENDPool);
+    await deployer.deploy(KRAP_COMPPool);
+    await deployer.deploy(KRAP_SNXPool);
+    await deployer.deploy(KRAP_YFIIPool);
+    await deployer.deploy(KRAP_CRVPool);
 
-    let eth_pool = new web3.eth.Contract(GRAP_ETHPool.abi, GRAP_ETHPool.address);
-    let yam_pool = new web3.eth.Contract(GRAP_YAMPool.abi, GRAP_YAMPool.address);
-    let yfi_pool = new web3.eth.Contract(GRAP_YFIPool.abi, GRAP_YFIPool.address);
-    let lend_pool = new web3.eth.Contract(GRAP_LENDPool.abi, GRAP_LENDPool.address);
-    let mkr_pool = new web3.eth.Contract(GRAP_MKRPool.abi, GRAP_MKRPool.address);
-    let snx_pool = new web3.eth.Contract(GRAP_SNXPool.abi, GRAP_SNXPool.address);
-    let comp_pool = new web3.eth.Contract(GRAP_COMPPool.abi, GRAP_COMPPool.address);
-    let link_pool = new web3.eth.Contract(GRAP_LINKPool.abi, GRAP_LINKPool.address);
-    let yfii_pool = new web3.eth.Contract(GRAP_YFIIPool.abi, GRAP_YFIIPool.address);
-    let crv_pool = new web3.eth.Contract(GRAP_CRVPool.abi, GRAP_CRVPool.address);
-    let ycrv_pool = new web3.eth.Contract(GRAPIncentivizer.abi, GRAPIncentivizer.address);
+    let eth_pool = new web3.eth.Contract(KRAP_ETHPool.abi, KRAP_ETHPool.address);
+    let yam_pool = new web3.eth.Contract(KRAP_YAMPool.abi, KRAP_YAMPool.address);
+    let yfi_pool = new web3.eth.Contract(KRAP_YFIPool.abi, KRAP_YFIPool.address);
+    let lend_pool = new web3.eth.Contract(KRAP_LENDPool.abi, KRAP_LENDPool.address);
+    let mkr_pool = new web3.eth.Contract(KRAP_MKRPool.abi, KRAP_MKRPool.address);
+    let snx_pool = new web3.eth.Contract(KRAP_SNXPool.abi, KRAP_SNXPool.address);
+    let comp_pool = new web3.eth.Contract(KRAP_COMPPool.abi, KRAP_COMPPool.address);
+    let link_pool = new web3.eth.Contract(KRAP_LINKPool.abi, KRAP_LINKPool.address);
+    let yfii_pool = new web3.eth.Contract(KRAP_YFIIPool.abi, KRAP_YFIIPool.address);
+    let crv_pool = new web3.eth.Contract(KRAP_CRVPool.abi, KRAP_CRVPool.address);
+    let ycrv_pool = new web3.eth.Contract(KRAPIncentivizer.abi, KRAPIncentivizer.address);
 
     console.log("setting distributor");
     await Promise.all([
@@ -98,17 +98,17 @@ async function deployDistribution(deployer, network, accounts) {
     console.log("transfering and notifying");
     console.log("eth");
     await Promise.all([
-      grap.transfer(GRAP_ETHPool.address, twenty.toString()),
-      grap.transfer(GRAP_YAMPool.address, twenty.toString()),
-      grap.transfer(GRAP_YFIPool.address, twenty.toString()),
-      grap.transfer(GRAP_LENDPool.address, twenty.toString()),
-      grap.transfer(GRAP_MKRPool.address, twenty.toString()),
-      grap.transfer(GRAP_SNXPool.address, twenty.toString()),
-      grap.transfer(GRAP_COMPPool.address, twenty.toString()),
-      grap.transfer(GRAP_LINKPool.address, twenty.toString()),
-      grap.transfer(GRAP_YFIIPool.address, twenty.toString()),
-      grap.transfer(GRAP_CRVPool.address, twenty.toString()),
-      grap._setIncentivizer(GRAPIncentivizer.address),
+      krap.transfer(KRAP_ETHPool.address, twenty.toString()),
+      krap.transfer(KRAP_YAMPool.address, twenty.toString()),
+      krap.transfer(KRAP_YFIPool.address, twenty.toString()),
+      krap.transfer(KRAP_LENDPool.address, twenty.toString()),
+      krap.transfer(KRAP_MKRPool.address, twenty.toString()),
+      krap.transfer(KRAP_SNXPool.address, twenty.toString()),
+      krap.transfer(KRAP_COMPPool.address, twenty.toString()),
+      krap.transfer(KRAP_LINKPool.address, twenty.toString()),
+      krap.transfer(KRAP_YFIIPool.address, twenty.toString()),
+      krap.transfer(KRAP_CRVPool.address, twenty.toString()),
+      krap._setIncentivizer(KRAPIncentivizer.address),
     ]);
 
     await Promise.all([
@@ -156,14 +156,14 @@ async function deployDistribution(deployer, network, accounts) {
   }
 
   await Promise.all([
-    grap._setPendingGov(Timelock.address),
+    krap._setPendingGov(Timelock.address),
     yReserves._setPendingGov(Timelock.address),
     yRebaser._setPendingGov(Timelock.address),
   ]);
 
   await Promise.all([
       tl.executeTransaction(
-        GRAPProxy.address,
+        KRAPProxy.address,
         0,
         "_acceptGov()",
         "0x",
@@ -171,7 +171,7 @@ async function deployDistribution(deployer, network, accounts) {
       ),
 
       tl.executeTransaction(
-        GRAPReserves.address,
+        KRAPReserves.address,
         0,
         "_acceptGov()",
         "0x",
@@ -179,7 +179,7 @@ async function deployDistribution(deployer, network, accounts) {
       ),
 
       tl.executeTransaction(
-        GRAPRebaser.address,
+        KRAPRebaser.address,
         0,
         "_acceptGov()",
         "0x",

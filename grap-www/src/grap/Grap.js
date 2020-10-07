@@ -12,7 +12,7 @@ import {
 
 const oneEther = 1000000000000000000;
 
-export class Grap {
+export class Krap {
   constructor(
     provider,
     networkId,

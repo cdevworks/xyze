@@ -1,12 +1,12 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import styled from 'styled-components'
 
-import { grap as grapAddress } from '../../../constants/tokenAddresses'
+import { krap as krapAddress } from '../../../constants/tokenAddresses'
 import useTokenBalance from '../../../hooks/useTokenBalance'
 import { getDisplayBalance } from '../../../utils/formatBalance'
 
-import { getCurrentVotes, getProposalThreshold } from '../../../grapUtils'
-import useGrap from '../../../hooks/useGrap'
+import { getCurrentVotes, getProposalThreshold } from '../../../krapUtils'
+import usekrap from '../../../hooks/usekrap'
 import useDelegate from '../../../hooks/useDelegate'
 import { useWallet } from 'use-wallet'
 
@@ -21,7 +21,7 @@ import ModalTitle from '../../ModalTitle'
 
 const AccountModal: React.FC<ModalProps> = ({ onDismiss }) => {
   const { account } = useWallet()
-  const grap = useGrap()
+  const krap = usekrap()
 
   const [votes, setvotes] = useState("")
   const [devsVotes, setdevsVotes] = useState("")
@@ -34,25 +34,25 @@ const AccountModal: React.FC<ModalProps> = ({ onDismiss }) => {
   const onDelegateSelf = useDelegate().onDelegate
   const onDelegateDev = useDelegate("0x00007569643bc1709561ec2E86F385Df3759e5DD").onDelegate
 
-  const grapBalance = useTokenBalance(grapAddress)
+  const krapBalance = useTokenBalance(krapAddress)
   const displayBalance = useMemo(() => {
-    return getDisplayBalance(grapBalance)
-  }, [grapBalance])
+    return getDisplayBalance(krapBalance)
+  }, [krapBalance])
 
   const fetchVotes = useCallback(async () => {
-    const votes = await getCurrentVotes(grap, account)
-    const devsVotes = await getCurrentVotes(grap, "0x00007569643bc1709561ec2E86F385Df3759e5DD")
-    const proposalThreshold = await getProposalThreshold(grap);
+    const votes = await getCurrentVotes(krap, account)
+    const devsVotes = await getCurrentVotes(krap, "0x00007569643bc1709561ec2E86F385Df3759e5DD")
+    const proposalThreshold = await getProposalThreshold(krap);
     setvotes(getDisplayBalance(votes))
     setdevsVotes(getDisplayBalance(devsVotes))
     setProposalThreshold(getDisplayBalance(proposalThreshold))
-  }, [account, grap])
+  }, [account, krap])
 
   useEffect(() => {
-    if (grap) {
+    if (krap) {
       fetchVotes()
     }
-  }, [fetchVotes, grap])
+  }, [fetchVotes, krap])
   
   
   return (
@@ -63,7 +63,7 @@ const AccountModal: React.FC<ModalProps> = ({ onDismiss }) => {
         <CardIcon>🍇</CardIcon>
         <StyledBalance>
           <StyledValue>{displayBalance}</StyledValue>
-          <Label text="GRAP Balance" />
+          <Label text="KRAP Balance" />
         </StyledBalance>
         <StyledBalance>
           <StyledValue>{votes}</StyledValue>
